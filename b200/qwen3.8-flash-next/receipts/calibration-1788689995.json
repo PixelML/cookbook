@@ -1,0 +1,73 @@
+{
+  "model": "nvidia/Qwen3.8-Flash-Next-NVFP4",
+  "model_revision": "fc694b54fb0174e0913e6adf86691ef85a4ead47",
+  "image_digest": "vllm/vllm-openai@sha256:41d42cfabd3289f40fdca71b4a0fe290474880d20e9534a90c698eb78e3eecee",
+  "tensor_parallel_size": 2,
+  "gpu_count": 2,
+  "boot_time_s": 1091.183434009552,
+  "gpu_memory": "memory.used [MiB], memory.total [MiB]\n96824 MiB, 183359 MiB\n96824 MiB, 183359 MiB",
+  "sweep": {
+    "16": {
+      "concurrency": 16,
+      "n_requests": 64,
+      "n_ok": 64,
+      "n_errors": 0,
+      "wall_time_s": 27.16246771812439,
+      "sum_completion_tokens": 40772,
+      "sum_prompt_tokens": 7407,
+      "output_tok_s": 1501.0418207619086,
+      "prompt_tok_s": 272.6924547822883,
+      "mean_resp_tokens": 637.0625,
+      "truncations": 17,
+      "dollars_per_m_output_tokens": 2.31320818260731,
+      "errors_sample": []
+    },
+    "32": {
+      "concurrency": 32,
+      "n_requests": 128,
+      "n_ok": 128,
+      "n_errors": 0,
+      "wall_time_s": 29.407572507858276,
+      "sum_completion_tokens": 67310,
+      "sum_prompt_tokens": 17869,
+      "output_tok_s": 2288.866242938395,
+      "prompt_tok_s": 607.6326087515403,
+      "mean_resp_tokens": 525.859375,
+      "truncations": 26,
+      "dollars_per_m_output_tokens": 1.5170053003030275,
+      "errors_sample": []
+    },
+    "64": {
+      "concurrency": 64,
+      "n_requests": 256,
+      "n_ok": 256,
+      "n_errors": 0,
+      "wall_time_s": 42.02159380912781,
+      "sum_completion_tokens": 150040,
+      "sum_prompt_tokens": 35210,
+      "output_tok_s": 3570.545198297756,
+      "prompt_tok_s": 837.9025355376166,
+      "mean_resp_tokens": 586.09375,
+      "truncations": 73,
+      "dollars_per_m_output_tokens": 0.9724627555135252,
+      "errors_sample": []
+    },
+    "128": {
+      "concurrency": 128,
+      "n_requests": 512,
+      "n_ok": 512,
+      "n_errors": 0,
+      "wall_time_s": 55.85948944091797,
+      "sum_completion_tokens": 293589,
+      "sum_prompt_tokens": 67485,
+      "output_tok_s": 5255.8482531517975,
+      "prompt_tok_s": 1208.120601807115,
+      "mean_resp_tokens": 573.416015625,
+      "truncations": 121,
+      "dollars_per_m_output_tokens": 0.660639739767985,
+      "errors_sample": []
+    }
+  },
+  "total_card_hours_this_job": 0.6920191986031002,
+  "estimated_cost_this_job_usd": 4.325119991269377
+}
