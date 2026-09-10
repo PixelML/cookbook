@@ -18,7 +18,7 @@
 | **What that buys** | **1,024 frames = 17.1 minutes** of 1 fps video in one request, whose entire KV is **0.87 GiB**. The context window binds, not memory. **Derived.** |
 | Temporal ordering | **32 frames recalled in exact order.** The upstream six-frame failure did **not** reproduce. **Measured.** |
 | Decode, c=1 | **331.0 tok/s** aggregate, warm, boot 1. **Measured.** |
-| Best throughput | **1,731.7 tok/s at c=16**, **$4.01/M** output tokens, each stream still getting **145.5 tok/s**. **Measured.** |
+| Best throughput | **1,724.4 tok/s at c=16**, **$4.03/M** output tokens, each stream still getting **145.8 tok/s**. From the knee sweep (admission cap 256), **not** from the two capped boots — see §5. **Measured.** |
 | Saturation | **knee at c=32** — aggregate falls to 667 tok/s, per-stream to 22.6, with **nothing queued**. Partly confounded by our own CUDA-graph cap; see §5. **Measured.** |
 | Concurrency ceiling | `--max-running-requests 512` **will not boot** — the sliding-window pool wants 31.56 GB against 18.88 GB free. **Measured.** |
 | Prefill | **51,527 tok/s** at 120,177 tokens; 25,675 tok/s at 60,095. **Measured.** |
@@ -139,13 +139,15 @@ GB."* Raising the admission cap from 32 to 256 costs about 8.7 million tokens of
 KV pool. On a model whose selling point is a tiny KV cache, the SWA cache is the
 binding constraint on concurrency.
 
-**Throughput peaks at c=16 and collapses at c=32** — aggregate 1,731.7 -> 667.0
-tok/s, per-stream 145.5 -> 22.6, with `queued_reqs` at **zero** throughout, so it
+**Throughput peaks at c=16 and collapses at c=32** — aggregate 1,724.4 -> 667.0
+tok/s, per-stream 145.8 -> 22.6, with `queued_reqs` at **zero** throughout, so it
 is genuine service collapse rather than an admission artefact. **Caveat:** the
 serving rung also carried `--cuda-graph-max-bs-decode 16`, so batches above 16 ran
 eager. The knee is real for this configuration; it is **not** established as a
 hardware property. Separating the two is untested — the boot that would have done
 it is the `--max-running-requests 512` rung that refused to start.
+
+**Two boots disagree at the level nearest the admission cap.** At `--max-running-requests 32`, boots 1 and 2 read **1,731.7 and 1,188.9** tok/s at c=16 — a 1.46x gap — while agreeing within 2% at c=1, 4 and 8. c=16 is the first level that approaches the cap, so that number describes our configuration rather than the hardware. **No headline figure is taken from c=16 on those boots.** The knee sweep at cap 256 reads 1,724.4, agreeing with boot 1 to 0.4% and marking boot 2 as the outlier. Resolving it properly needs a third boot at cap 32, which is untested. This is the reason the two-boot rule exists: a single boot here would have shipped either number with equal confidence.
 
 **`/metrics` is empty without `--enable-metrics`.** Boots 1 and 2 could not
 report DSPARK acceptance or running-vs-queued occupancy for this reason. The
