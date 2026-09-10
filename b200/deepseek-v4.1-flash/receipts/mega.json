@@ -1,0 +1,867 @@
+{
+  "kind": "consolidated",
+  "gpus": "B200 x4",
+  "engine_image": "lmsysorg/sglang@sha256:c4ca651192e57e91989b5176c3665148131b9a171e53861dee87f5e57cef25b5",
+  "model": "deepseek-ai/DeepSeek-V4.1-Flash",
+  "node_rate_usd_per_hr": 25.0,
+  "price_basis": "$6.25/B200-hour (Modal list) x 4 cards",
+  "max_tokens": 256,
+  "concurrencies": [
+    1,
+    8,
+    16,
+    32,
+    64,
+    128,
+    256,
+    512
+  ],
+  "harness": "modal_mega.py",
+  "note": "ONE cold start serves every arm. --max-running-requests is 512 here against 32 in v2-boot1/2, so the concurrency rows are a SEPARATE pin set from those boots and are tabled separately.",
+  "launch_cmd": "python3 -m sglang.launch_server --model-path /vol/dsv41 --trust-remote-code --tp 4 --ep-size 4 --speculative-algorithm DSPARK --speculative-dspark-block-size 5 --reasoning-parser auto --tool-call-parser auto --host 127.0.0.1 --port 30000 --mem-fraction-static 0.80 --max-running-requests 256 --cuda-graph-max-bs-decode 16 --enable-metrics",
+  "cold_start_s": 541.1,
+  "serving_rung": 2,
+  "launch_attempts": [
+    {
+      "rung": 1,
+      "launch_cmd": "python3 -m sglang.launch_server --model-path /vol/dsv41 --trust-remote-code --tp 4 --ep-size 4 --speculative-algorithm DSPARK --speculative-dspark-block-size 5 --reasoning-parser auto --tool-call-parser auto --host 127.0.0.1 --port 30000 --mem-fraction-static 0.80 --max-running-requests 512 --cuda-graph-max-bs-decode 32 --enable-metrics",
+      "cold_start_s": 1080.2,
+      "healthy": false,
+      "log_tail": "/sglang/srt/mem_cache/kv_cache_configurator.py\", line 2226, in _resolve_memory_pool_config\n    config = self.config_from_budget(available_bytes)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/mem_cache/kv_cache_configurator.py\", line 2247, in config_from_budget\n    config = configurator.calculate_pool_sizes(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/model_executor/pool_configurator.py\", line 1256, in calculate_pool_sizes\n    raise RuntimeError(\nRuntimeError: The DSV4 SWA pool cap (1415424 tokens, 31.56 GB) leaves no room for the full KV pool within the available 18.88 GB. Reduce --max-running-requests, lower --swa-prefix-tails or SGLANG_SWA_EVICTION_INTERVAL, or increase --mem-fraction-static.\n\n[2026-09-10 15:11:21 TP2 EP2] Scheduler hit an exception: Traceback (most recent call last):\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 5680, in run_scheduler_process\n    scheduler = Scheduler(\n                ^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 562, in __init__\n    self.init_model_worker()\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 1090, in init_model_worker\n    self.init_memory_pools()\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 1056, in init_memory_pools\n    self.init_target_memory_pool()\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 1052, in init_target_memory_pool\n    self.tp_worker.alloc_memory_pool()\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/tp_worker.py\", line 420, in alloc_memory_pool\n    self.model_runner.alloc_memory_pool(memory_pool_config)\n  File \"/sgl-workspace/sglang/python/sglang/srt/model_executor/model_runner.py\", line 894, in alloc_memory_pool\n    result = self.kv_cache_configurator.configure(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/mem_cache/kv_cache_configurator.py\", line 327, in configure\n    config = self._resolve_memory_pool_config(pre_model_load_memory)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/mem_cache/kv_cache_configurator.py\", line 2226, in _resolve_memory_pool_config\n    config = self.config_from_budget(available_bytes)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/mem_cache/kv_cache_configurator.py\", line 2247, in config_from_budget\n    config = configurator.calculate_pool_sizes(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/model_executor/pool_configurator.py\", line 1256, in calculate_pool_sizes\n    raise RuntimeError(\nRuntimeError: The DSV4 SWA pool cap (1415424 tokens, 31.56 GB) leaves no room for the full KV pool within the available 18.88 GB. Reduce --max-running-requests, lower --swa-prefix-tails or SGLANG_SWA_EVICTION_INTERVAL, or increase --mem-fraction-static.\n\n[2026-09-10 15:11:21 TP3 EP3] Scheduler hit an exception: Traceback (most recent call last):\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 5680, in run_scheduler_process\n    scheduler = Scheduler(\n                ^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 562, in __init__\n    self.init_model_worker()\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 1090, in init_model_worker\n    self.init_memory_pools()\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 1056, in init_memory_pools\n    self.init_target_memory_pool()\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 1052, in init_target_memory_pool\n    self.tp_worker.alloc_memory_pool()\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/tp_worker.py\", line 420, in alloc_memory_pool\n    self.model_runner.alloc_memory_pool(memory_pool_config)\n  File \"/sgl-workspace/sglang/python/sglang/srt/model_executor/model_runner.py\", line 894, in alloc_memory_pool\n    result = self.kv_cache_configurator.configure(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/mem_cache/kv_cache_configurator.py\", line 327, in configure\n    config = self._resolve_memory_pool_config(pre_model_load_memory)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/mem_cache/kv_cache_configurator.py\", line 2226, in _resolve_memory_pool_config\n    config = self.config_from_budget(available_bytes)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/mem_cache/kv_cache_configurator.py\", line 2247, in config_from_budget\n    config = configurator.calculate_pool_sizes(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/model_executor/pool_configurator.py\", line 1256, in calculate_pool_sizes\n    raise RuntimeError(\nRuntimeError: The DSV4 SWA pool cap (1415424 tokens, 31.56 GB) leaves no room for the full KV pool within the available 18.88 GB. Reduce --max-running-requests, lower --swa-prefix-tails or SGLANG_SWA_EVICTION_INTERVAL, or increase --mem-fraction-static.\n\n[2026-09-10 15:11:21 TP1 EP1] Scheduler hit an exception: Traceback (most recent call last):\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 5680, in run_scheduler_process\n    scheduler = Scheduler(\n                ^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 562, in __init__\n    self.init_model_worker()\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 1090, in init_model_worker\n    self.init_memory_pools()\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 1056, in init_memory_pools\n    self.init_target_memory_pool()\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 1052, in init_target_memory_pool\n    self.tp_worker.alloc_memory_pool()\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/tp_worker.py\", line 420, in alloc_memory_pool\n    self.model_runner.alloc_memory_pool(memory_pool_config)\n  File \"/sgl-workspace/sglang/python/sglang/srt/model_executor/model_runner.py\", line 894, in alloc_memory_pool\n    result = self.kv_cache_configurator.configure(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/mem_cache/kv_cache_configurator.py\", line 327, in configure\n    config = self._resolve_memory_pool_config(pre_model_load_memory)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/mem_cache/kv_cache_configurator.py\", line 2226, in _resolve_memory_pool_config\n    config = self.config_from_budget(available_bytes)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/mem_cache/kv_cache_configurator.py\", line 2247, in config_from_budget\n    config = configurator.calculate_pool_sizes(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/model_executor/pool_configurator.py\", line 1256, in calculate_pool_sizes\n    raise RuntimeError(\nRuntimeError: The DSV4 SWA pool cap (1415424 tokens, 31.56 GB) leaves no room for the full KV pool within the available 18.88 GB. Reduce --max-running-requests, lower --swa-prefix-tails or SGLANG_SWA_EVICTION_INTERVAL, or increase --mem-fraction-static.\n\n[2026-09-10 15:11:21] Received sigquit from a child process. It usually means the child failed.\n[2026-09-10 15:11:21] kill_process_tree called: parent_pid=30, include_parent=True, pid=30\n[2026-09-10 15:11:21] Received sigquit from a child process. It usually means the child failed.\n[2026-09-10 15:11:21] kill_process_tree called: parent_pid=30, include_parent=True, pid=30\n"
+    },
+    {
+      "rung": 2,
+      "launch_cmd": "python3 -m sglang.launch_server --model-path /vol/dsv41 --trust-remote-code --tp 4 --ep-size 4 --speculative-algorithm DSPARK --speculative-dspark-block-size 5 --reasoning-parser auto --tool-call-parser auto --host 127.0.0.1 --port 30000 --mem-fraction-static 0.80 --max-running-requests 256 --cuda-graph-max-bs-decode 16 --enable-metrics",
+      "cold_start_s": 541.1,
+      "healthy": true
+    }
+  ],
+  "cold_starts_paid": 2,
+  "kv_accounting": {
+    "max_total_num_tokens": 1753088,
+    "kv_cache_dtype": "fp8_e4m3",
+    "chunked_prefill_size": 16384,
+    "max_running_requests": 256,
+    "page_size": 256,
+    "log_kv_lines": [
+      "[2026-09-10 15:18:35 TP0 EP0] Capture draft verify CUDA graph begin. backend=full, num_tokens_per_req=5, bs=[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16], avail mem=28.60 GB",
+      "[2026-09-10 15:18:35 TP1 EP1] Capture draft verify CUDA graph begin. backend=full, num_tokens_per_req=5, bs=[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16], avail mem=28.54 GB",
+      "[2026-09-10 15:18:35 TP2 EP2] Capture draft verify CUDA graph begin. backend=full, num_tokens_per_req=5, bs=[1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16], avail mem=28.53 GB",
+      "Capturing batches (bs=16 avail_mem=28.60 GB):   0%|          | 0/12 [00:00<?, ?it/s][2026-09-10 15:18:36 TP2 EP2] Running FlashInfer autotune with cache: /root/.cache/sglang/flashinfer/autotune/0.6.18/sm100/8e0ed9bb3b13d5ca/rank_tp2_pp0_dp0.json",
+      "Capturing batches (bs=16 avail_mem=28.60 GB):   8%|\u258a         | 1/12 [00:51<09:29, 51.77s/it]",
+      "Capturing batches (bs=14 avail_mem=28.56 GB):   8%|\u258a         | 1/12 [00:51<09:29, 51.77s/it]",
+      "Capturing batches (bs=14 avail_mem=28.56 GB):  17%|\u2588\u258b        | 2/12 [00:52<03:37, 21.71s/it]",
+      "Capturing batches (bs=12 avail_mem=28.56 GB):  17%|\u2588\u258b        | 2/12 [00:52<03:37, 21.71s/it]",
+      "Capturing batches (bs=10 avail_mem=28.56 GB):  17%|\u2588\u258b        | 2/12 [00:52<03:37, 21.71s/it]",
+      "Capturing batches (bs=10 avail_mem=28.56 GB):  33%|\u2588\u2588\u2588\u258e      | 4/12 [00:52<01:05,  8.14s/it]",
+      "Capturing batches (bs=8 avail_mem=28.55 GB):  33%|\u2588\u2588\u2588\u258e      | 4/12 [00:52<01:05,  8.14s/it] ",
+      "Capturing batches (bs=7 avail_mem=28.55 GB):  33%|\u2588\u2588\u2588\u258e      | 4/12 [00:52<01:05,  8.14s/it]",
+      "Capturing batches (bs=7 avail_mem=28.55 GB):  50%|\u2588\u2588\u2588\u2588\u2588     | 6/12 [00:52<00:26,  4.37s/it]",
+      "Capturing batches (bs=6 avail_mem=28.54 GB):  50%|\u2588\u2588\u2588\u2588\u2588     | 6/12 [00:52<00:26,  4.37s/it]",
+      "Capturing batches (bs=5 avail_mem=28.54 GB):  50%|\u2588\u2588\u2588\u2588\u2588     | 6/12 [00:52<00:26,  4.37s/it]",
+      "Capturing batches (bs=5 avail_mem=28.54 GB):  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 8/12 [00:53<00:10,  2.63s/it]",
+      "Capturing batches (bs=4 avail_mem=28.54 GB):  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 8/12 [00:53<00:10,  2.63s/it]",
+      "Capturing batches (bs=3 avail_mem=28.53 GB):  67%|\u2588\u2588\u2588\u2588\u2588\u2588\u258b   | 8/12 [00:53<00:10,  2.63s/it]",
+      "Capturing batches (bs=3 avail_mem=28.53 GB):  83%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e | 10/12 [00:59<00:05,  2.85s/it]",
+      "Capturing batches (bs=2 avail_mem=28.53 GB):  83%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e | 10/12 [00:59<00:05,  2.85s/it]",
+      "Capturing batches (bs=2 avail_mem=28.53 GB):  92%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 11/12 [00:59<00:02,  2.30s/it]",
+      "Capturing batches (bs=1 avail_mem=28.53 GB):  92%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 11/12 [00:59<00:02,  2.30s/it]",
+      "Capturing batches (bs=1 avail_mem=28.53 GB): 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 12/12 [00:59<00:00,  1.81s/it]",
+      "Capturing batches (bs=1 avail_mem=28.53 GB): 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 12/12 [00:59<00:00,  4.98s/it]",
+      "[2026-09-10 15:19:36 TP1 EP1] Capture draft verify CUDA graph end. elapsed=60.71 s, mem usage=0.08 GB, avail mem=28.46 GB.",
+      "[2026-09-10 15:19:36 TP1 EP1] Init Unified Radix Cache. Components: (<ComponentType.FULL: 0>, <ComponentType.SWA: 1>). Tree Core: UnifiedTreeCore",
+      "[2026-09-10 15:19:36 TP2 EP2] Capture draft verify CUDA graph end. elapsed=60.72 s, mem usage=0.08 GB, avail mem=28.46 GB.",
+      "[2026-09-10 15:19:36 TP1 EP1] Tree cache initialized: source=default impl=UnifiedRadixCache hybrid_swa=True hybrid_ssm=False hicache_attached=False streaming_wrapped=False",
+      "[2026-09-10 15:19:36 TP2 EP2] Init Unified Radix Cache. Components: (<ComponentType.FULL: 0>, <ComponentType.SWA: 1>). Tree Core: UnifiedTreeCore",
+      "[2026-09-10 15:19:36 TP2 EP2] Tree cache initialized: source=default impl=UnifiedRadixCache hybrid_swa=True hybrid_ssm=False hicache_attached=False streaming_wrapped=False",
+      "[2026-09-10 15:19:36 TP3 EP3] Capture draft verify CUDA graph end. elapsed=60.81 s, mem usage=0.08 GB, avail mem=28.77 GB.",
+      "[2026-09-10 15:19:36 TP3 EP3] Init Unified Radix Cache. Components: (<ComponentType.FULL: 0>, <ComponentType.SWA: 1>). Tree Core: UnifiedTreeCore",
+      "[2026-09-10 15:19:36 TP3 EP3] Tree cache initialized: source=default impl=UnifiedRadixCache hybrid_swa=True hybrid_ssm=False hicache_attached=False streaming_wrapped=False",
+      "[2026-09-10 15:19:36 TP0 EP0] Capture draft verify CUDA graph end. elapsed=60.84 s, mem usage=0.08 GB, avail mem=28.52 GB.",
+      "[2026-09-10 15:19:36 TP0 EP0] max_total_num_tokens=1753088, chunked_prefill_size=16384, max_prefill_tokens=16384, max_running_requests=256, context_len=1048576, available_gpu_mem=28.52 GB",
+      "[2026-09-10 15:19:36 TP0 EP0] Init Unified Radix Cache. Components: (<ComponentType.FULL: 0>, <ComponentType.SWA: 1>). Tree Core: UnifiedTreeCore",
+      "[2026-09-10 15:19:36 TP0 EP0] Tree cache initialized: source=default impl=UnifiedRadixCache hybrid_swa=True hybrid_ssm=False hicache_attached=False streaming_wrapped=False",
+      "[2026-09-10 15:19:48 TP0 EP0] Prefill batch, #new-seq: 1, #new-token: 256, #cached-token: 0, full token usage: 0.00, swa token usage: 0.00, #running-req: 0, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 21.42",
+      "[2026-09-10 15:20:20 TP0 EP0] Prefill batch, #new-seq: 1, #new-token: 256, #cached-token: 0, full token usage: 0.00, swa token usage: 0.00, #running-req: 0, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 8.06",
+      "[2026-09-10 15:20:24 TP0 EP0] Prefill batch, #new-seq: 1, #new-token: 256, #cached-token: 0, full token usage: 0.00, swa token usage: 0.00, #running-req: 0, #queue-req: 0, #pending-token: 0, cuda graph: False, input throughput (token/s): 60.98"
+    ],
+    "nvidia_smi": [
+      "0, 153439 MiB, 183359 MiB",
+      "1, 153504 MiB, 183359 MiB",
+      "2, 153505 MiB, 183359 MiB",
+      "3, 153184 MiB, 183359 MiB"
+    ]
+  },
+  "arm_concurrency": [
+    {
+      "concurrency": 1,
+      "wave": 1,
+      "wall_s": 0.778,
+      "requests": 1,
+      "n_ok": 1,
+      "n_errors": 0,
+      "output_tokens": 256,
+      "aggregate_tok_s": 329.06,
+      "median_per_request_tok_s": 329.55,
+      "p99_per_request_tok_s": 329.55,
+      "min_per_request_tok_s": 329.55,
+      "median_ttft_s": 0.168,
+      "p99_ttft_s": 0.168,
+      "occupancy": {
+        "running_reqs": {
+          "max": 1.0,
+          "mean": 0.33
+        },
+        "queued_reqs": {
+          "max": 0.0,
+          "mean": 0.0
+        },
+        "kv_token_usage_frac": {
+          "max": 0.0,
+          "mean": 0.0
+        },
+        "samples": 3
+      },
+      "above_reading_speed": true,
+      "above_unpleasant": true,
+      "usd_per_m_output_tokens": 21.104,
+      "by_workload_median_tok_s": {
+        "code": 329.55
+      }
+    },
+    {
+      "concurrency": 1,
+      "wave": 2,
+      "wall_s": 0.781,
+      "requests": 1,
+      "n_ok": 1,
+      "n_errors": 0,
+      "output_tokens": 256,
+      "aggregate_tok_s": 327.95,
+      "median_per_request_tok_s": 328.22,
+      "p99_per_request_tok_s": 328.22,
+      "min_per_request_tok_s": 328.22,
+      "median_ttft_s": 0.173,
+      "p99_ttft_s": 0.173,
+      "occupancy": {
+        "running_reqs": {
+          "max": 1.0,
+          "mean": 0.67
+        },
+        "queued_reqs": {
+          "max": 0.0,
+          "mean": 0.0
+        },
+        "kv_token_usage_frac": {
+          "max": 0.0,
+          "mean": 0.0
+        },
+        "samples": 3
+      },
+      "above_reading_speed": true,
+      "above_unpleasant": true,
+      "usd_per_m_output_tokens": 21.175,
+      "by_workload_median_tok_s": {
+        "code": 328.22
+      }
+    },
+    {
+      "concurrency": 8,
+      "wave": 1,
+      "wall_s": 3.386,
+      "requests": 8,
+      "n_ok": 8,
+      "n_errors": 0,
+      "output_tokens": 2048,
+      "aggregate_tok_s": 604.79,
+      "median_per_request_tok_s": 108.67,
+      "p99_per_request_tok_s": 116.14,
+      "min_per_request_tok_s": 75.81,
+      "median_ttft_s": 1.206,
+      "p99_ttft_s": 1.208,
+      "occupancy": {
+        "running_reqs": {
+          "max": 8.0,
+          "mean": 3.0
+        },
+        "queued_reqs": {
+          "max": 0.0,
+          "mean": 0.0
+        },
+        "kv_token_usage_frac": {
+          "max": 0.0,
+          "mean": 0.0
+        },
+        "samples": 13
+      },
+      "above_reading_speed": true,
+      "above_unpleasant": true,
+      "usd_per_m_output_tokens": 11.482,
+      "by_workload_median_tok_s": {
+        "code": 106.03,
+        "math": 116.14,
+        "chat": 76.48
+      }
+    },
+    {
+      "concurrency": 8,
+      "wave": 2,
+      "wall_s": 1.964,
+      "requests": 8,
+      "n_ok": 8,
+      "n_errors": 0,
+      "output_tokens": 2048,
+      "aggregate_tok_s": 1042.97,
+      "median_per_request_tok_s": 178.62,
+      "p99_per_request_tok_s": 189.44,
+      "min_per_request_tok_s": 130.69,
+      "median_ttft_s": 0.371,
+      "p99_ttft_s": 0.372,
+      "occupancy": {
+        "running_reqs": {
+          "max": 8.0,
+          "mean": 3.0
+        },
+        "queued_reqs": {
+          "max": 0.0,
+          "mean": 0.0
+        },
+        "kv_token_usage_frac": {
+          "max": 0.0,
+          "mean": 0.0
+        },
+        "samples": 8
+      },
+      "above_reading_speed": true,
+      "above_unpleasant": true,
+      "usd_per_m_output_tokens": 6.658,
+      "by_workload_median_tok_s": {
+        "code": 175.98,
+        "math": 189.44,
+        "chat": 133.08
+      }
+    },
+    {
+      "concurrency": 16,
+      "wave": 1,
+      "wall_s": 3.723,
+      "requests": 16,
+      "n_ok": 16,
+      "n_errors": 0,
+      "output_tokens": 4096,
+      "aggregate_tok_s": 1100.16,
+      "median_per_request_tok_s": 94.78,
+      "p99_per_request_tok_s": 99.55,
+      "min_per_request_tok_s": 68.89,
+      "median_ttft_s": 1.304,
+      "p99_ttft_s": 1.31,
+      "occupancy": {
+        "running_reqs": {
+          "max": 16.0,
+          "mean": 3.5
+        },
+        "queued_reqs": {
+          "max": 0.0,
+          "mean": 0.0
+        },
+        "kv_token_usage_frac": {
+          "max": 0.01,
+          "mean": 0.01
+        },
+        "samples": 14
+      },
+      "above_reading_speed": true,
+      "above_unpleasant": true,
+      "usd_per_m_output_tokens": 6.312,
+      "by_workload_median_tok_s": {
+        "code": 94.5,
+        "math": 98.01,
+        "chat": 71.18
+      }
+    },
+    {
+      "concurrency": 16,
+      "wave": 2,
+      "wall_s": 2.375,
+      "requests": 16,
+      "n_ok": 16,
+      "n_errors": 0,
+      "output_tokens": 4096,
+      "aggregate_tok_s": 1724.38,
+      "median_per_request_tok_s": 145.75,
+      "p99_per_request_tok_s": 157.41,
+      "min_per_request_tok_s": 108.06,
+      "median_ttft_s": 0.368,
+      "p99_ttft_s": 0.373,
+      "occupancy": {
+        "running_reqs": {
+          "max": 16.0,
+          "mean": 12.0
+        },
+        "queued_reqs": {
+          "max": 0.0,
+          "mean": 0.0
+        },
+        "kv_token_usage_frac": {
+          "max": 0.01,
+          "mean": 0.01
+        },
+        "samples": 9
+      },
+      "above_reading_speed": true,
+      "above_unpleasant": true,
+      "usd_per_m_output_tokens": 4.027,
+      "by_workload_median_tok_s": {
+        "code": 145.06,
+        "math": 153.62,
+        "chat": 113.81
+      }
+    },
+    {
+      "concurrency": 32,
+      "wave": 1,
+      "wall_s": 13.898,
+      "requests": 32,
+      "n_ok": 32,
+      "n_errors": 0,
+      "output_tokens": 8192,
+      "aggregate_tok_s": 589.44,
+      "median_per_request_tok_s": 19.69,
+      "p99_per_request_tok_s": 22.0,
+      "min_per_request_tok_s": 18.44,
+      "median_ttft_s": 2.121,
+      "p99_ttft_s": 2.128,
+      "occupancy": {
+        "running_reqs": {
+          "max": 32.0,
+          "mean": 23.45
+        },
+        "queued_reqs": {
+          "max": 0.0,
+          "mean": 0.0
+        },
+        "kv_token_usage_frac": {
+          "max": 0.01,
+          "mean": 0.01
+        },
+        "samples": 53
+      },
+      "above_reading_speed": false,
+      "above_unpleasant": true,
+      "usd_per_m_output_tokens": 11.781,
+      "by_workload_median_tok_s": {
+        "code": 19.69,
+        "math": 20.81,
+        "chat": 18.55
+      }
+    },
+    {
+      "concurrency": 32,
+      "wave": 2,
+      "wall_s": 12.282,
+      "requests": 32,
+      "n_ok": 32,
+      "n_errors": 0,
+      "output_tokens": 8192,
+      "aggregate_tok_s": 667.02,
+      "median_per_request_tok_s": 22.59,
+      "p99_per_request_tok_s": 25.24,
+      "min_per_request_tok_s": 20.87,
+      "median_ttft_s": 0.53,
+      "p99_ttft_s": 0.54,
+      "occupancy": {
+        "running_reqs": {
+          "max": 32.0,
+          "mean": 26.36
+        },
+        "queued_reqs": {
+          "max": 0.0,
+          "mean": 0.0
+        },
+        "kv_token_usage_frac": {
+          "max": 0.01,
+          "mean": 0.01
+        },
+        "samples": 47
+      },
+      "above_reading_speed": false,
+      "above_unpleasant": true,
+      "usd_per_m_output_tokens": 10.411,
+      "by_workload_median_tok_s": {
+        "code": 22.55,
+        "math": 24.0,
+        "chat": 21.1
+      }
+    }
+  ],
+  "saturation": {
+    "at_concurrency": 32,
+    "reason": "aggregate throughput stopped rising",
+    "previous": 1724.38,
+    "this": 667.02
+  },
+  "acceptance": {
+    "decode_probe": [
+      {
+        "tok_s": 301.82,
+        "ttft_s": 0.191,
+        "completion_tokens": 256
+      },
+      {
+        "tok_s": 352.34,
+        "ttft_s": 0.172,
+        "completion_tokens": 256
+      },
+      {
+        "tok_s": 221.73,
+        "ttft_s": 0.166,
+        "completion_tokens": 256
+      }
+    ],
+    "spec_before": {
+      "sglang:spec_verify_calls_total{engine_type=\"unified\",model_name=\"/vol/dsv41\"}": 8619.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"1\",phase=\"draft_prefill\",pp_rank=\"0\",tp_rank=\"1\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"1\",phase=\"draft_decode\",pp_rank=\"0\",tp_rank=\"1\"}": 0.076171875,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"1\",phase=\"draft_extend\",pp_rank=\"0\",tp_rank=\"1\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"2\",phase=\"draft_prefill\",pp_rank=\"0\",tp_rank=\"2\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"2\",phase=\"draft_decode\",pp_rank=\"0\",tp_rank=\"2\"}": 0.076171875,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"2\",phase=\"draft_extend\",pp_rank=\"0\",tp_rank=\"2\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"3\",phase=\"draft_prefill\",pp_rank=\"0\",tp_rank=\"3\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"3\",phase=\"draft_decode\",pp_rank=\"0\",tp_rank=\"3\"}": 0.076171875,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"3\",phase=\"draft_extend\",pp_rank=\"0\",tp_rank=\"3\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",phase=\"draft_prefill\",pp_rank=\"0\",tp_rank=\"0\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",phase=\"draft_decode\",pp_rank=\"0\",tp_rank=\"0\"}": 0.076171875,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",phase=\"draft_extend\",pp_rank=\"0\",tp_rank=\"0\"}": 0.0,
+      "sglang:spec_accept_length{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 3.2171136653895274,
+      "sglang:spec_accept_rate{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 0.4434227330779055,
+      "sglang:spec_cap_length{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 0.0,
+      "sglang:spec_block_accept_length{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 0.0,
+      "sglang:spec_num_steps{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 1.0,
+      "sglang:spec_num_draft_tokens{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 6.0,
+      "sglang:startup_cuda_graph_time_seconds{engine_type=\"unified\",model_name=\"/vol/dsv41\",phase=\"draft_prefill\"}": 0.0,
+      "sglang:startup_cuda_graph_time_seconds{engine_type=\"unified\",model_name=\"/vol/dsv41\",phase=\"draft_decode\"}": 60.84053743000004,
+      "sglang:startup_cuda_graph_time_seconds{engine_type=\"unified\",model_name=\"/vol/dsv41\",phase=\"draft_extend\"}": 0.0
+    },
+    "spec_after": {
+      "sglang:spec_verify_calls_total{engine_type=\"unified\",model_name=\"/vol/dsv41\"}": 8844.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"1\",phase=\"draft_prefill\",pp_rank=\"0\",tp_rank=\"1\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"1\",phase=\"draft_decode\",pp_rank=\"0\",tp_rank=\"1\"}": 0.076171875,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"1\",phase=\"draft_extend\",pp_rank=\"0\",tp_rank=\"1\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"2\",phase=\"draft_prefill\",pp_rank=\"0\",tp_rank=\"2\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"2\",phase=\"draft_decode\",pp_rank=\"0\",tp_rank=\"2\"}": 0.076171875,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"2\",phase=\"draft_extend\",pp_rank=\"0\",tp_rank=\"2\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"3\",phase=\"draft_prefill\",pp_rank=\"0\",tp_rank=\"3\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"3\",phase=\"draft_decode\",pp_rank=\"0\",tp_rank=\"3\"}": 0.076171875,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"3\",phase=\"draft_extend\",pp_rank=\"0\",tp_rank=\"3\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",phase=\"draft_prefill\",pp_rank=\"0\",tp_rank=\"0\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",phase=\"draft_decode\",pp_rank=\"0\",tp_rank=\"0\"}": 0.076171875,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",phase=\"draft_extend\",pp_rank=\"0\",tp_rank=\"0\"}": 0.0,
+      "sglang:spec_accept_length{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 2.75,
+      "sglang:spec_accept_rate{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 0.35,
+      "sglang:spec_cap_length{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 0.0,
+      "sglang:spec_block_accept_length{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 0.0,
+      "sglang:spec_num_steps{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 1.0,
+      "sglang:spec_num_draft_tokens{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 6.0,
+      "sglang:startup_cuda_graph_time_seconds{engine_type=\"unified\",model_name=\"/vol/dsv41\",phase=\"draft_prefill\"}": 0.0,
+      "sglang:startup_cuda_graph_time_seconds{engine_type=\"unified\",model_name=\"/vol/dsv41\",phase=\"draft_decode\"}": 60.84053743000004,
+      "sglang:startup_cuda_graph_time_seconds{engine_type=\"unified\",model_name=\"/vol/dsv41\",phase=\"draft_extend\"}": 0.0
+    },
+    "spec_delta": {
+      "sglang:spec_verify_calls_total{engine_type=\"unified\",model_name=\"/vol/dsv41\"}": 225.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"1\",phase=\"draft_prefill\",pp_rank=\"0\",tp_rank=\"1\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"1\",phase=\"draft_decode\",pp_rank=\"0\",tp_rank=\"1\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"1\",phase=\"draft_extend\",pp_rank=\"0\",tp_rank=\"1\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"2\",phase=\"draft_prefill\",pp_rank=\"0\",tp_rank=\"2\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"2\",phase=\"draft_decode\",pp_rank=\"0\",tp_rank=\"2\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"2\",phase=\"draft_extend\",pp_rank=\"0\",tp_rank=\"2\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"3\",phase=\"draft_prefill\",pp_rank=\"0\",tp_rank=\"3\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"3\",phase=\"draft_decode\",pp_rank=\"0\",tp_rank=\"3\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"3\",phase=\"draft_extend\",pp_rank=\"0\",tp_rank=\"3\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",phase=\"draft_prefill\",pp_rank=\"0\",tp_rank=\"0\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",phase=\"draft_decode\",pp_rank=\"0\",tp_rank=\"0\"}": 0.0,
+      "sglang:graph_memory_usage_gb{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",phase=\"draft_extend\",pp_rank=\"0\",tp_rank=\"0\"}": 0.0,
+      "sglang:spec_accept_length{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": -0.4671,
+      "sglang:spec_accept_rate{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": -0.0934,
+      "sglang:spec_cap_length{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 0.0,
+      "sglang:spec_block_accept_length{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 0.0,
+      "sglang:spec_num_steps{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 0.0,
+      "sglang:spec_num_draft_tokens{engine_type=\"unified\",model_name=\"/vol/dsv41\",moe_ep_rank=\"0\",pp_rank=\"0\",tp_rank=\"0\"}": 0.0,
+      "sglang:startup_cuda_graph_time_seconds{engine_type=\"unified\",model_name=\"/vol/dsv41\",phase=\"draft_prefill\"}": 0.0,
+      "sglang:startup_cuda_graph_time_seconds{engine_type=\"unified\",model_name=\"/vol/dsv41\",phase=\"draft_decode\"}": 0.0,
+      "sglang:startup_cuda_graph_time_seconds{engine_type=\"unified\",model_name=\"/vol/dsv41\",phase=\"draft_extend\"}": 0.0
+    },
+    "metrics_endpoint_populated": true
+  },
+  "arm_temporal": [
+    {
+      "n_frames": 8,
+      "colour_offset": 0,
+      "expected": [
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "black",
+        "white"
+      ],
+      "got": [
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "brown",
+        "white"
+      ],
+      "exact_order_match": false,
+      "positional_accuracy": 0.875,
+      "set_match_unordered": false,
+      "prompt_tokens": 1768,
+      "ttft_s": 0.7,
+      "status": "ok",
+      "raw_reply": "red, blue, green, yellow, purple, orange, brown, white"
+    },
+    {
+      "n_frames": 8,
+      "colour_offset": 1,
+      "expected": [
+        "blue",
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "black",
+        "white",
+        "cyan"
+      ],
+      "got": [
+        "blue",
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "black",
+        "white",
+        "cyan"
+      ],
+      "exact_order_match": true,
+      "positional_accuracy": 1.0,
+      "set_match_unordered": true,
+      "prompt_tokens": 1768,
+      "ttft_s": 0.29,
+      "status": "ok",
+      "raw_reply": "blue, green, yellow, purple, orange, black, white, cyan"
+    },
+    {
+      "n_frames": 8,
+      "colour_offset": 2,
+      "expected": [
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "black",
+        "white",
+        "cyan",
+        "magenta"
+      ],
+      "got": [
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "black",
+        "white",
+        "cyan",
+        "magenta"
+      ],
+      "exact_order_match": true,
+      "positional_accuracy": 1.0,
+      "set_match_unordered": true,
+      "prompt_tokens": 1768,
+      "ttft_s": 0.27,
+      "status": "ok",
+      "raw_reply": "green, yellow, purple, orange, black, white, cyan, magenta"
+    },
+    {
+      "n_frames": 8,
+      "colour_offset": 3,
+      "expected": [
+        "yellow",
+        "purple",
+        "orange",
+        "black",
+        "white",
+        "cyan",
+        "magenta",
+        "brown"
+      ],
+      "got": [
+        "yellow",
+        "purple",
+        "orange",
+        "black",
+        "white",
+        "cyan",
+        "magenta",
+        "brown"
+      ],
+      "exact_order_match": true,
+      "positional_accuracy": 1.0,
+      "set_match_unordered": true,
+      "prompt_tokens": 1768,
+      "ttft_s": 0.28,
+      "status": "ok",
+      "raw_reply": "yellow, purple, orange, black, white, cyan, magenta, brown"
+    },
+    {
+      "n_frames": 8,
+      "colour_offset": 4,
+      "expected": [
+        "purple",
+        "orange",
+        "black",
+        "white",
+        "cyan",
+        "magenta",
+        "brown",
+        "grey"
+      ],
+      "got": [
+        "purple",
+        "orange",
+        "black",
+        "white",
+        "cyan",
+        "magenta",
+        "brown",
+        "grey"
+      ],
+      "exact_order_match": true,
+      "positional_accuracy": 1.0,
+      "set_match_unordered": true,
+      "prompt_tokens": 1768,
+      "ttft_s": 0.27,
+      "status": "ok",
+      "raw_reply": "purple, orange, black, white, cyan, magenta, brown, grey"
+    },
+    {
+      "n_frames": 2,
+      "colour_offset": 0,
+      "expected": [
+        "red",
+        "blue"
+      ],
+      "got": [
+        "red",
+        "blue"
+      ],
+      "exact_order_match": true,
+      "positional_accuracy": 1.0,
+      "set_match_unordered": true,
+      "prompt_tokens": 490,
+      "ttft_s": 0.23,
+      "status": "ok",
+      "raw_reply": "red, blue"
+    },
+    {
+      "n_frames": 4,
+      "colour_offset": 0,
+      "expected": [
+        "red",
+        "blue",
+        "green",
+        "yellow"
+      ],
+      "got": [
+        "red",
+        "blue",
+        "green",
+        "yellow"
+      ],
+      "exact_order_match": true,
+      "positional_accuracy": 1.0,
+      "set_match_unordered": true,
+      "prompt_tokens": 916,
+      "ttft_s": 0.21,
+      "status": "ok",
+      "raw_reply": "red, blue, green, yellow"
+    },
+    {
+      "n_frames": 16,
+      "colour_offset": 0,
+      "expected": [
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "black",
+        "white",
+        "cyan",
+        "magenta",
+        "brown",
+        "grey",
+        "red",
+        "blue",
+        "green",
+        "yellow"
+      ],
+      "got": [
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "black",
+        "white",
+        "cyan",
+        "magenta",
+        "brown",
+        "grey",
+        "red",
+        "blue",
+        "green",
+        "yellow"
+      ],
+      "exact_order_match": true,
+      "positional_accuracy": 1.0,
+      "set_match_unordered": true,
+      "prompt_tokens": 3472,
+      "ttft_s": 1.24,
+      "status": "ok",
+      "raw_reply": "red, blue, green, yellow, purple, orange, black, white, cyan, magenta, brown, grey, red, blue, green, yellow"
+    },
+    {
+      "n_frames": 32,
+      "colour_offset": 0,
+      "expected": [
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "black",
+        "white",
+        "cyan",
+        "magenta",
+        "brown",
+        "grey",
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "black",
+        "white",
+        "cyan",
+        "magenta",
+        "brown",
+        "grey",
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "black",
+        "white"
+      ],
+      "got": [
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "black",
+        "white",
+        "cyan",
+        "magenta",
+        "brown",
+        "grey",
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "black",
+        "white",
+        "cyan",
+        "magenta",
+        "brown",
+        "grey",
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "black",
+        "white"
+      ],
+      "exact_order_match": true,
+      "positional_accuracy": 1.0,
+      "set_match_unordered": true,
+      "prompt_tokens": 6880,
+      "ttft_s": 0.75,
+      "status": "ok",
+      "raw_reply": "red, blue, green, yellow, purple, orange, black, white, cyan, magenta, brown, grey, red, blue, green, yellow, purple, orange, black, white, cyan, magenta, brown, grey, red, blue, green, yellow, purple, orange, black, white"
+    }
+  ],
+  "temporal_n8_repeats": {
+    "n": 5,
+    "exact_order_passes": 4,
+    "positional_accuracy": [
+      0.875,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "median_positional_accuracy": 1.0
+  },
+  "arm_prefill": [
+    {
+      "target_prompt_tokens": 65536,
+      "video_s_at_1fps_1024tok": 64.0,
+      "status": "ok",
+      "actual_prompt_tokens": 60095,
+      "ttft_s": 2.34,
+      "total_s": 2.35,
+      "prefill_tok_s": 25674.6,
+      "reply_head": "ACK"
+    },
+    {
+      "target_prompt_tokens": 131072,
+      "video_s_at_1fps_1024tok": 128.0,
+      "status": "ok",
+      "actual_prompt_tokens": 120177,
+      "ttft_s": 2.33,
+      "total_s": 2.34,
+      "prefill_tok_s": 51526.7,
+      "reply_head": "ACK"
+    },
+    {
+      "target_prompt_tokens": 262144,
+      "video_s_at_1fps_1024tok": 256.0,
+      "status": "error",
+      "error": "RemoteDisconnected: Remote end closed connection without response",
+      "server_alive_after": false,
+      "log_tail": " pos, forward_batch)\n  File \"/sgl-workspace/sglang/python/sglang/srt/layers/attention/deepseek_v4_backend.py\", line 3054, in _low_ratio_index_topk_extend\n    self._low_ratio_index_topk_dense(\n  File \"/sgl-workspace/sglang/python/sglang/srt/layers/attention/deepseek_v4_backend.py\", line 3125, in _low_ratio_index_topk_dense\n    self._publish_or_consume_candidates(\n  File \"/sgl-workspace/sglang/python/sglang/srt/layers/attention/deepseek_v4_backend.py\", line 3179, in _publish_or_consume_candidates\n    publish.append(masks[0] if len(masks) == 1 else torch.cat(masks))\n                                                    ^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 3.33 GiB. GPU 2 has a total capacity of 178.35 GiB of which 2.82 GiB is free. Process 1 has 175.52 GiB memory in use. Of the allocated memory 168.27 GiB is allocated by PyTorch, with 1.76 GiB allocated in private pools (e.g., CUDA Graphs), and 2.66 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\n[2026-09-10 15:21:21 TP0 EP0] Scheduler hit an exception: Traceback (most recent call last):\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 5696, in run_scheduler_process\n    scheduler.run_event_loop()\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 1839, in run_event_loop\n    dispatch_event_loop(self)\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 5542, in dispatch_event_loop\n    scheduler.event_loop_overlap()\n  File \"/opt/sglang/lib/python3.12/site-packages/torch/utils/_contextlib.py\", line 124, in decorate_context\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 1937, in event_loop_overlap\n    batch_result = self.run_batch(batch)\n                   ^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/utils/nvtx_utils.py\", line 109, in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/scheduler.py\", line 4181, in run_batch\n    batch_result = self.model_worker.forward_batch_generation(\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/speculative/dspark_components/dspark_worker_v2.py\", line 526, in forward_batch_generation\n    return self._forward_prefill(batch, on_publish)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/speculative/dspark_components/dspark_worker_v2.py\", line 540, in _forward_prefill\n    batch_output = self.target_worker.forward_batch_generation(\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/managers/tp_worker.py\", line 634, in forward_batch_generation\n    out = self.model_runner.forward(\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/model_executor/model_runner.py\", line 1645, in forward\n    output = self._forward_raw(\n             ^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/model_executor/model_runner.py\", line 1832, in _forward_raw\n    ret = self.eager_runner.execute(\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/model_executor/runner/eager_runner.py\", line 227, in execute\n    return self._execute_extend(forward_batch, pp_proxy_tensors)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/model_executor/runner/eager_runner.py\", line 371, in _execute_extend\n    ret = model_runner.model.forward(\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/sglang/lib/python3.12/site-packages/torch/utils/_contextlib.py\", line 124, in decorate_context\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v4.py\", line 4268, in forward\n    hidden_states = self.model.forward(\n                    ^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v4.py\", line 3920, in forward\n    hidden_states, last_pre, tail = self._forward_layers_hc_pre_from_prev(\n                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v4.py\", line 3603, in _forward_layers_hc_pre_from_prev\n    hidden_states, prev_pre = self.layers[i].forward_hc_pre_from_prev(\n                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v4.py\", line 2762, in forward_hc_pre_from_prev\n    x = self.self_attn(\n        ^^^^^^^^^^^^^^^\n  File \"/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1778, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/sglang/lib/python3.12/site-packages/torch/nn/modules/module.py\", line 1789, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v4.py\", line 1917, in forward\n    q, kv = self._forward_prepare(\n            ^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sgl-workspace/sglang/python/sglang/srt/models/deepseek_v4.py\", line 1781, in _forward_prepare\n    attn_backend.forward_low_ratio_sources(\n  File \"/sgl-workspace/sglang/python/sglang/srt/layers/attention/deepseek_v4_backend.py\", line 2740, in forward_low_ratio_sources\n    self._low_ratio_index_topk(layer, x, q_lora, req, pos, forward_batch)\n  File \"/sgl-workspace/sglang/python/sglang/srt/layers/attention/deepseek_v4_backend.py\", line 3028, in _low_ratio_index_topk\n    self._low_ratio_index_topk_extend(layer, x, q_lora, pos, forward_batch)\n  File \"/sgl-workspace/sglang/python/sglang/srt/layers/attention/deepseek_v4_backend.py\", line 3054, in _low_ratio_index_topk_extend\n    self._low_ratio_index_topk_dense(\n  File \"/sgl-workspace/sglang/python/sglang/srt/layers/attention/deepseek_v4_backend.py\", line 3125, in _low_ratio_index_topk_dense\n    self._publish_or_consume_candidates(\n  File \"/sgl-workspace/sglang/python/sglang/srt/layers/attention/deepseek_v4_backend.py\", line 3179, in _publish_or_consume_candidates\n    publish.append(masks[0] if len(masks) == 1 else torch.cat(masks))\n                                                    ^^^^^^^^^^^^^^^^\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 3.33 GiB. GPU 0 has a total capacity of 178.35 GiB of which 2.88 GiB is free. Process 1 has 175.45 GiB memory in use. Of the allocated memory 168.27 GiB is allocated by PyTorch, with 1.76 GiB allocated in private pools (e.g., CUDA Graphs), and 2.66 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n\n[2026-09-10 15:21:21] SIGQUIT received. signum=None, frame=None. It usually means one child failed.\n[2026-09-10 15:21:21] Sleeping 5 seconds before crash diagnostics to let GPU activity settle.\n[rank0]:[W910 15:21:21.549521338 ProcessGroupNCCL.cpp:1624] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())\n[2026-09-10 15:21:26] No live scheduler processes found; skipping py-spy and CUDA coredump.\n[2026-09-10 15:21:26] kill_process_tree called: parent_pid=4906, include_parent=True, pid=4906\n"
+    }
+  ],
+  "metrics_final": {},
+  "status": "ok",
+  "elapsed_s": 1682.5,
+  "cost_usd": 11.68,
+  "ts": "2026-09-10T15:21:26Z"
+}
