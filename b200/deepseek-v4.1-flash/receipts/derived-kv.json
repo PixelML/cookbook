@@ -1,0 +1,119 @@
+{
+  "label": "derived \u2014 from published architecture parameters, not measured",
+  "config_source": "deepseek-ai/DeepSeek-V4.1-Flash config.json",
+  "v41_architecture": {
+    "num_hidden_layers": 40,
+    "kv_source_layer_ids": [
+      2,
+      8,
+      14,
+      20
+    ],
+    "num_key_value_heads": 1,
+    "head_dim": 512,
+    "qk_rope_head_dim": 64,
+    "sliding_window": 128,
+    "max_position_embeddings": 1048576,
+    "compress_ratio_by_source_layer": {
+      "2": 2,
+      "8": 2,
+      "14": 2,
+      "20": 1
+    },
+    "max_image_tokens": 1024
+  },
+  "storage_assumption": "KV stored FP4 (E2M1) with one E4M3 scale per 16 channels; RoPE half at 1 B/element plus its own per-16 scale. Stated because it is the combination that reproduces the card's 890 B/token exactly.",
+  "bytes_per_token_derivation": {
+    "bytes_per_cached_layer_token": 356.0,
+    "effective_cached_layers": 2.5,
+    "naive_cached_layers": 4.0,
+    "bytes_per_token": 890.0,
+    "bytes_per_token_ignoring_compress_ratios": 1424.0,
+    "card_claim_bytes_per_token": 890
+  },
+  "kv_pool_gib_assumed": 200,
+  "comparison": [
+    {
+      "model": "Llama-3.1-405B (GQA, FP16)",
+      "kv_bytes_per_token": 516096,
+      "kv_kib_per_token": 504.0,
+      "gib_for_1M_token_request": 480.65,
+      "x_larger_than_v41": 579.9
+    },
+    {
+      "model": "Llama-3.1-70B (GQA, FP16)",
+      "kv_bytes_per_token": 327680,
+      "kv_kib_per_token": 320.0,
+      "gib_for_1M_token_request": 305.18,
+      "x_larger_than_v41": 368.2
+    },
+    {
+      "model": "Qwen3-235B-A22B (GQA, FP16)",
+      "kv_bytes_per_token": 192512,
+      "kv_kib_per_token": 188.0,
+      "gib_for_1M_token_request": 179.29,
+      "x_larger_than_v41": 216.3
+    },
+    {
+      "model": "DeepSeek-V3 (MLA, FP8)",
+      "kv_bytes_per_token": 35136,
+      "kv_kib_per_token": 34.312,
+      "gib_for_1M_token_request": 32.72,
+      "x_larger_than_v41": 39.5
+    },
+    {
+      "model": "DeepSeek-V4.1-Flash",
+      "kv_bytes_per_token": 890,
+      "kv_kib_per_token": 0.869,
+      "gib_for_1M_token_request": 0.83,
+      "x_larger_than_v41": 1.0
+    }
+  ],
+  "frontier_requests_in_pool": [
+    {
+      "context_tokens": 8192,
+      "Llama-3.1-405B (GQA, FP16)": 50,
+      "Llama-3.1-70B (GQA, FP16)": 80,
+      "Qwen3-235B-A22B (GQA, FP16)": 136,
+      "DeepSeek-V3 (MLA, FP8)": 746,
+      "DeepSeek-V4.1-Flash": 29454
+    },
+    {
+      "context_tokens": 32768,
+      "Llama-3.1-405B (GQA, FP16)": 12,
+      "Llama-3.1-70B (GQA, FP16)": 20,
+      "Qwen3-235B-A22B (GQA, FP16)": 34,
+      "DeepSeek-V3 (MLA, FP8)": 186,
+      "DeepSeek-V4.1-Flash": 7363
+    },
+    {
+      "context_tokens": 131072,
+      "Llama-3.1-405B (GQA, FP16)": 3,
+      "Llama-3.1-70B (GQA, FP16)": 5,
+      "Qwen3-235B-A22B (GQA, FP16)": 8,
+      "DeepSeek-V3 (MLA, FP8)": 46,
+      "DeepSeek-V4.1-Flash": 1840
+    },
+    {
+      "context_tokens": 1000000,
+      "Llama-3.1-405B (GQA, FP16)": 0,
+      "Llama-3.1-70B (GQA, FP16)": 0,
+      "Qwen3-235B-A22B (GQA, FP16)": 1,
+      "DeepSeek-V3 (MLA, FP8)": 6,
+      "DeepSeek-V4.1-Flash": 241
+    }
+  ],
+  "video": {
+    "image_tokens_per_frame": 1024,
+    "context_ceiling_tokens": 1048576,
+    "max_frames_per_request": 1024,
+    "max_video_seconds_at_1fps": 1024,
+    "max_video_minutes_at_1fps": 17.1,
+    "full_context_kv_gib": 0.869,
+    "ten_min_clip_tokens": 614400,
+    "ten_min_clip_kv_gib_v41": 0.509,
+    "ten_min_clip_kv_gib_llama70b": 187.5,
+    "concurrent_ten_min_clips_in_pool": 392,
+    "reading": "The context window, not the KV cache, is the binding constraint for video on this model. A full 1M-token context costs under a gigabyte of cache."
+  }
+}
