@@ -1,0 +1,31 @@
+{
+  "as_of": "2026-09-17",
+  "provenance_notes": {
+    "MEASURED": "real API runs on public videos (11-min public game-show episode; 75-min public MDDI parliament webcast)",
+    "INTERPOLATED": "ingest $/video-hour — placeholder pending vendor figure",
+    "PROJECTED": "monthly totals derived from the parameters in this notebook"
+  },
+  "gemini_agentic_per_query": [
+    {"video": "public game show, 11.3 min", "model": "gemini-3.7-flash", "tokens_prompt": 61778, "tokens_total": 62001, "usd": 0.0316, "wall_s": 10.0},
+    {"video": "public game show, 11.3 min", "model": "gemini-3.8-flash", "tokens_prompt": 409581, "note": "this row is the 75-min parliament video, see below"},
+    {"video": "public parliament webcast, 75 min", "model": "gemini-3.7-flash", "tokens_prompt": 409581, "tokens_total": 410017, "usd": 0.2061, "wall_s": 49.7},
+    {"video": "public parliament webcast, 75 min", "model": "gemini-3.8-flash", "tokens_prompt": 409581, "tokens_total": 410257, "usd": 0.2075, "wall_s": 48.3},
+    {"video": "public keynote, 23 min", "model": "gemini-3.7-flash", "tokens_prompt": 126395, "tokens_total": 127649, "usd": 0.0670, "wall_s": 13.9}
+  ],
+  "indexed_pipeline_per_query": {
+    "model": "gpt-5.6-luna (answer) + TypeSafe jev-latest (scene judge)",
+    "range_usd": [0.0011, 0.0044],
+    "examples": [
+      {"video": "11.3 min", "usd": 0.0029, "wall_ms_p50": 7300},
+      {"video": "75 min, single video", "usd": 0.0017, "wall_ms_p50": 10000},
+      {"video": "21-video library, one query across all", "usd": 0.0031, "wall_s": 10.7}
+    ],
+    "decomposition_ms_p50": {"search": 2.0, "judge": 3.4, "answer_llm": 5.3}
+  },
+  "gemini_media_tokens_per_video_hour": 328000,
+  "accuracy_small_n": {
+    "parliament_8q_judged": {"indexed": "6/8", "gemini": "6/8", "note": "not significant at n=8"},
+    "bench_30q_x3": {"indexed_direct_gpt56luna": "57%", "gemini_native": "78%", "gap_driver": "visual-only stratum 0% vs 89% (captions cannot see what captions did not describe)", "note": "binomial CI overlap; n too small for directional claims"}
+  },
+  "ingest_usd_per_video_hour": {"value": 0.30, "provenance": "INTERPOLATED"}
+}
