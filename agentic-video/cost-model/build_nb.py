@@ -43,7 +43,7 @@ GEM_CACHE_STORE = 0.175               # $/M tokens per hour held (flash tier)
 TOK_PER_VIDEO_HOUR = 328_000          # MEASURED (409,581 tok / 75 min -> 327,665; round)
 OUT_PER_QUERY = 300                   # output+thought tokens per answer (MEASURED 66-2,131 across receipts)
 VIDEO_HOURS = [1_000, 10_000, 100_000]
-QUERIES_PER_MONTH = 1_000
+QUERIES_PER_MONTH = 300_000           # system volume: MAM editorial search + CCTV agent scraping (~10k queries/day)
 HOLD_HOURS_PER_MONTH = 730            # cache held continuously
 
 INGEST_PER_VH = 0.30                  # INTERPOLATED — pending vendor figure
@@ -94,8 +94,9 @@ print("chart 1 saved")""")
 
 md("The indexed line is flat: per-query cost does not grow with library size. Both baselines scale linearly with hours (the cached one is ~10× cheaper than naive at any size but still grows). Storage changes the *fixed* side, not this chart — chart 3 shows it.")
 
-md("### 2. Monthly total vs queries/month (with break-evens)")
-code("""Q = np.logspace(0, 5, 150)
+md("### 2. Monthly cost vs query volume — the system-scale question")
+md("**Who queries an indexed library at volume?** A MAM: 50 editors x 200 searches/day = 300k queries/month. A CCTV/monitoring deployment: agents scraping the index continuously. App backends answering 'find the moment' for end users. At these volumes the per-query billing model - not the one-time ingest - decides feasibility.")
+code("""Q = np.logspace(0, 6, 200)
 fig, ax = plt.subplots(figsize=(9,5.5))
 colors = {1000:"#4285F4", 10000:"#34A853", 100000:"#FBBC04"}
 for h in VIDEO_HOURS:
@@ -105,7 +106,7 @@ for h in VIDEO_HOURS:
     ax.plot(Q, free_m,  lw=1.6, ls="--", color=colors[h], alpha=0.55)
     ax.plot(Q, cache_m, lw=1.6, ls=":",  color=colors[h], alpha=0.8)
     ax.plot(Q, idx_m,   lw=2.4, color=colors[h], label=f"indexed · {h:,} h")
-    ax.text(1.1, idx_m[40]*1.15, f"{h:,} h", fontsize=8, color=colors[h])
+    ax.text(1.1, idx_m[-1]*1.15, f"{h:,} h", fontsize=8, color=colors[h])
 for h in VIDEO_HOURS:
     qbe = (INGEST_PER_VH*h) / max(index_free_cost_per_query(h) - indexed_per_query(), 1e-9)
     ax.axvline(min(qbe, Q[-1]), color=colors[h], alpha=0.3, lw=1)
@@ -146,7 +147,16 @@ ax.set_xticks(xs); ax.set_xticklabels([f"{h:,} h" for h in VIDEO_HOURS])
 ax.set_ylabel("monthly cost ($, log)"); ax.set_title(f"Monthly cost at {QUERIES_PER_MONTH:,} library-wide queries/month")
 ax.legend(fontsize=8.5); ax.grid(axis="y", alpha=0.25)
 fig.tight_layout(); fig.savefig("charts/monthly-by-scale.png", dpi=150); plt.close(fig)
-print("chart 3 saved")""")
+print("chart 3 saved")
+
+h = 10_000; q = 300_000
+free = q * index_free_cost_per_query(h)
+cch = q * cached_read_per_query(h) + cached_storage_per_month(h) + cached_write_one_time(h)
+idx = q * indexed_per_query() + INGEST_PER_VH * h
+print(f"300k queries/mo on a {h:,} h library:")
+print(f"  index-free scan : ${free:,.0f}/mo")
+print(f"  cached baseline : ${cch:,.0f}/mo")
+print(f"  indexed pipeline: ${idx:,.0f}/mo  ->  {cch/idx:,.0f}x cheaper than cached, {free/idx:,.0f}x than scan")""")
 
 md("### 4. 12-month view on a 10,000-hour library (indexed left · cached right)")
 code("""h = 10_000
