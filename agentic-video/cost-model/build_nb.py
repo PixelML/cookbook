@@ -11,10 +11,12 @@ md("""# Indexed vs index-free video question answering — a cost model at libra
 **agentic.video + Jev** · Pixel ML · numbers as of **2026-09-17**
 
 TL;DR
-- An index-free agentic baseline (send the whole video to a video-LM per query) re-bills ~328k media tokens **per video-hour, per query**. At 1,000 library-wide queries/month over a 1,000-hour library that is **~$164k/month**.
-- An indexed pipeline (one-time ingest, then retrieval + a judged answer) pays **~$300 one-time per 1,000 hours** and **~$0.003 per query, flat** — ~$303/month all-in. Marginal cost per query is **~2–3 orders of magnitude lower** and does not grow with library size.
-- Against a context-cached baseline the **marginal** gap is ~5,500× (cache reads vs indexed query); all-in for a first month (cache write + **storage held continuously** + reads vs amortized ingest + queries) it is **~54×**. Storage is the cache's dominant term — we model it explicitly.
+- An index-free agentic baseline (send the whole video to a video-LM per query) re-bills ~328k media tokens **per video-hour, per query**. At 300k library-wide queries/month over a 1,000-hour library that is **~$49M/month**.
+- An indexed pipeline (one-time ingest, then retrieval + a judged answer) pays **~$300 one-time per 1,000 hours** and **~$0.003 per query, flat** — ~$1,200/month all-in at that volume. Marginal cost per query is **~2–3 orders of magnitude lower** and does not grow with library size.
+- Against a context-cached baseline the **marginal** gap is ~5,500× (cache reads vs indexed query); all-in for a month (cache write + **storage held continuously** + reads vs amortized ingest + queries) it is **~4,000×** at 1k hours and **grows with library size**. Storage is the cache's dominant term — we model it explicitly.
 - Accuracy on our small public benchmarks is **a tie or a Gemini win** (n too small for claims); the honest finding is *compute placement*, not quality: **one-time indexing vs per-query video tokens**.
+
+**Who queries an indexed library at volume?** A MAM: 50 editors × 200 searches/day ≈ 300k queries/month. A CCTV/monitoring deployment: agents scraping the index continuously. App backends answering "find the moment" for end users. At these volumes the per-query billing model — not the one-time ingest — decides feasibility.
 
 Every number carries a provenance label: **MEASURED** (real runs, receipts in [`receipts/`](receipts/measured-2026-09-17.json)), **INTERPOLATED**, **PROJECTED**. Vendor prices are list, as of 2026-09-17, and will change.
 """)
@@ -43,7 +45,7 @@ GEM_CACHE_STORE = 0.175               # $/M tokens per hour held (flash tier)
 TOK_PER_VIDEO_HOUR = 328_000          # MEASURED (409,581 tok / 75 min -> 327,665; round)
 OUT_PER_QUERY = 300                   # output+thought tokens per answer (MEASURED 66-2,131 across receipts)
 VIDEO_HOURS = [1_000, 10_000, 100_000]
-QUERIES_PER_MONTH = 300_000           # system volume: MAM editorial search + CCTV agent scraping (~10k queries/day)
+QUERIES_PER_MONTH = 300_000           # system volume: MAM editorial search + CCTV agent scraping (~10k/day)
 HOLD_HOURS_PER_MONTH = 730            # cache held continuously
 
 INGEST_PER_VH = 0.30                  # INTERPOLATED — pending vendor figure
@@ -68,12 +70,11 @@ def cached_storage_per_month(video_hours):
 def indexed_per_query():
     return INDEXED_PER_QUERY
 
-print(f"index-free  per query @1k h : ${index_free_cost_per_query(1000):,.2f}")
-print(f"cached read per query @1k h : ${cached_read_per_query(1000):,.2f}")
-print(f"cached storage /mo    @1k h : ${cached_storage_per_month(1000):,.0f}")
-print(f"cached all-in /mo     @1k h : ${cached_write_one_time(1000)/12 + cached_storage_per_month(1000) + 1000*cached_read_per_query(1000):,.0f}")
-print(f"indexed     per query       : ${indexed_per_query():.4f}")
-print(f"indexed all-in /mo    @1k h : ${INGEST_PER_VH*1000/12 + 1000*indexed_per_query():,.2f} (amortized) or ${INGEST_PER_VH*1000 + 1000*indexed_per_query():,.0f} month-1")""")
+h0 = 1_000
+print(f"index-free  per query @1k h : ${index_free_cost_per_query(h0):,.2f}")
+print(f"cached read per query @1k h : ${cached_read_per_query(h0):,.2f}")
+print(f"cached storage /mo    @1k h : ${cached_storage_per_month(h0):,.0f}")
+print(f"indexed     per query       : ${indexed_per_query():.4f}")""")
 
 md("### 1. Cost per query vs library size (log–log)")
 code("""H = np.logspace(0, 5.3, 120)
@@ -83,7 +84,6 @@ fig, ax = plt.subplots(figsize=(9,5.5))
 ax.plot(H, free_q, label="index-free baseline (video tokens per query)", lw=2)
 ax.plot(H, cache_q, label="cached baseline (read + output)", lw=2)
 ax.axhline(indexed_per_query(), color="#1A73E8", lw=2, label="indexed pipeline (MEASURED, flat)")
-ax.fill_between(H, [indexed_per_query()]*len(H), cache_q, alpha=0.08, color="#1A73E8")
 ax.fill_between(H, [index_free_cost_per_query(h,0.7) for h in H], [index_free_cost_per_query(h,1.3) for h in H], alpha=0.15, color="grey", label="±30% price band (index-free)")
 ax.set_xscale("log"); ax.set_yscale("log")
 ax.set_xlabel("library size (video-hours)"); ax.set_ylabel("cost per library-wide query ($)")
@@ -95,7 +95,7 @@ print("chart 1 saved")""")
 md("The indexed line is flat: per-query cost does not grow with library size. Both baselines scale linearly with hours (the cached one is ~10× cheaper than naive at any size but still grows). Storage changes the *fixed* side, not this chart — chart 3 shows it.")
 
 md("### 2. Monthly cost vs query volume — the system-scale question")
-md("**Who queries an indexed library at volume?** A MAM: 50 editors x 200 searches/day = 300k queries/month. A CCTV/monitoring deployment: agents scraping the index continuously. App backends answering 'find the moment' for end users. At these volumes the per-query billing model - not the one-time ingest - decides feasibility.")
+md("**Who queries an indexed library at volume?** A MAM: 50 editors × 200 searches/day ≈ 300k queries/month. A CCTV/monitoring deployment: agents scraping the index continuously. App backends answering 'find the moment' for end users. At these volumes the per-query billing model — not the one-time ingest — decides feasibility.")
 code("""Q = np.logspace(0, 6, 200)
 fig, ax = plt.subplots(figsize=(9,5.5))
 colors = {1000:"#4285F4", 10000:"#34A853", 100000:"#FBBC04"}
@@ -122,7 +122,7 @@ print("chart 2 saved")""")
 
 md("Read: the indexed line sits **below every baseline at essentially all volumes** for library-wide queries — the one-time ingest breaks even after ~2 queries against the index-free baseline. The cached baseline's monthly **storage floor** (chart 3) is what keeps it above.")
 
-md("### 3. Where the money goes at 1,000 queries/month")
+md("### 3. Where the money goes at 300,000 queries/month")
 code("""fig, ax = plt.subplots(figsize=(9,5.5))
 W = 0.28
 xs = np.arange(len(VIDEO_HOURS))
@@ -147,16 +147,17 @@ ax.set_xticks(xs); ax.set_xticklabels([f"{h:,} h" for h in VIDEO_HOURS])
 ax.set_ylabel("monthly cost ($, log)"); ax.set_title(f"Monthly cost at {QUERIES_PER_MONTH:,} library-wide queries/month")
 ax.legend(fontsize=8.5); ax.grid(axis="y", alpha=0.25)
 fig.tight_layout(); fig.savefig("charts/monthly-by-scale.png", dpi=150); plt.close(fig)
-print("chart 3 saved")
 
-h = 10_000; q = 300_000
+h = 10_000; q = QUERIES_PER_MONTH
 free = q * index_free_cost_per_query(h)
 cch = q * cached_read_per_query(h) + cached_storage_per_month(h) + cached_write_one_time(h)
 idx = q * indexed_per_query() + INGEST_PER_VH * h
-print(f"300k queries/mo on a {h:,} h library:")
+print(f"{q:,} queries/mo on a {h:,} h library:")
 print(f"  index-free scan : ${free:,.0f}/mo")
-print(f"  cached baseline : ${cch:,.0f}/mo")
+print(f"  cached baseline : ${cch:,.0f}/mo (reads ${q*cached_read_per_query(h):,.0f} + storage ${cs:,.0f} + write ${cw:,.0f})")
 print(f"  indexed pipeline: ${idx:,.0f}/mo  ->  {cch/idx:,.0f}x cheaper than cached, {free/idx:,.0f}x than scan")""")
+
+md("Read: at system volumes the cached baseline's **storage** joins its **reads** above the indexed line by orders of magnitude — and the index-free scan is not merely expensive but operationally infeasible (one video-LM call per query per video, at 300k queries/month).")
 
 md("### 4. 12-month view on a 10,000-hour library (indexed left · cached right)")
 code("""h = 10_000
@@ -174,7 +175,7 @@ ax2.stackplot(months, np.full(12,cw), np.full(12,cs), np.full(12,cr),
 ax2.set_ylabel("cached baseline monthly $"); ax2.set_title("cached baseline (storage dominates)")
 ax2.legend(fontsize=8, loc="center left"); ax2.grid(alpha=0.2)
 free_line = QUERIES_PER_MONTH*index_free_cost_per_query(h)
-fig.suptitle(f"10,000 h library · 1,000 queries/mo · 12 months · index-free: ${free_line:,.0f}/mo", fontsize=11)
+fig.suptitle(f"10,000 h library · {QUERIES_PER_MONTH:,} queries/mo · 12 months · index-free: ${free_line:,.0f}/mo", fontsize=11)
 fig.tight_layout(); fig.savefig("charts/12mo-10kh.png", dpi=150); plt.close(fig)
 print("chart 4 saved")""")
 
@@ -199,9 +200,14 @@ ax.set_xscale("log"); ax.set_xlabel("cost per query ($)"); ax.set_ylabel("accura
 ax.set_title("Accuracy vs cost by stratum · 11-min video · n too small for significance")
 ax.grid(alpha=0.25)
 fig.tight_layout(); fig.savefig("charts/accuracy-vs-cost.png", dpi=150); plt.close(fig)
-print("chart 5 saved")
+print("chart 5 saved")""")
 
-md(\"\"\"**Statistics note.** Pooled over repeats (n=90 indexed / n=50 gemini): overall 95% CIs are [46.8, 67.3] vs [68.9, 86.2] — non-overlapping (z≈3.05) **if repeats are treated as independent**, which overstates confidence (the same 30 questions repeat 3×). At question level (n=30) the gap is ≈1.8 SE — not significant. Parliament n=8 is a tie. Treat accuracy as: parity on transcript-heavy questions; structural deficit on visual-only; overall ranking unresolved at this sample size.\"\"\")""")
+stats = ("**Statistics note.** Pooled over repeats (n=90 indexed / n=50 gemini): overall 95% CIs are "
+         "[46.8, 67.3] vs [68.9, 86.2] — non-overlapping (z≈3.05) **if repeats are treated as independent**, "
+         "which overstates confidence (the same 30 questions repeat 3×). At question level (n=30) the gap is "
+         "≈1.8 SE — not significant. Parliament n=8 is a tie. Treat accuracy as: parity on transcript-heavy "
+         "questions; structural deficit on visual-only; overall ranking unresolved at this sample size.")
+cells.append(nbf.v4.new_markdown_cell(stats))
 
 md("""### 6. Latency (MEASURED p50; p95 not measured)
 
