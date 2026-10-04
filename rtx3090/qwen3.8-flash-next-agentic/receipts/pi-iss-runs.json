@@ -1,0 +1,1042 @@
+{
+ "run1": {
+  "desc": "first build",
+  "max_context": 40960,
+  "turns": 21,
+  "final_stop": "length",
+  "peak_context": 36966,
+  "tool_calls": {
+   "bash": 22,
+   "read": 1,
+   "advisor": 1
+  },
+  "writes": [],
+  "per_turn": [
+   {
+    "turn": 1,
+    "context_tokens": 11188,
+    "output_tokens": 140,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 2,
+    "context_tokens": 11802,
+    "output_tokens": 180,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 3,
+    "context_tokens": 16502,
+    "output_tokens": 4090,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 4,
+    "context_tokens": 17199,
+    "output_tokens": 79,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 5,
+    "context_tokens": 19713,
+    "output_tokens": 2408,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 6,
+    "context_tokens": 20605,
+    "output_tokens": 397,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 7,
+    "context_tokens": 21387,
+    "output_tokens": 476,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 8,
+    "context_tokens": 22717,
+    "output_tokens": 675,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 9,
+    "context_tokens": 23597,
+    "output_tokens": 632,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 10,
+    "context_tokens": 24290,
+    "output_tokens": 426,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 11,
+    "context_tokens": 24783,
+    "output_tokens": 325,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 12,
+    "context_tokens": 25242,
+    "output_tokens": 377,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 13,
+    "context_tokens": 28528,
+    "output_tokens": 614,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 14,
+    "context_tokens": 29298,
+    "output_tokens": 478,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 15,
+    "context_tokens": 29940,
+    "output_tokens": 490,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 16,
+    "context_tokens": 30297,
+    "output_tokens": 274,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 17,
+    "context_tokens": 30685,
+    "output_tokens": 253,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 18,
+    "context_tokens": 31482,
+    "output_tokens": 686,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 19,
+    "context_tokens": 32230,
+    "output_tokens": 306,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 20,
+    "context_tokens": 36906,
+    "output_tokens": 4503,
+    "stop": "length"
+   },
+   {
+    "turn": 21,
+    "context_tokens": 36966,
+    "output_tokens": 1,
+    "stop": "length"
+   }
+  ]
+ },
+ "run2": {
+  "desc": "rebuild, textures reused",
+  "max_context": 40960,
+  "turns": 10,
+  "final_stop": "length",
+  "peak_context": 36942,
+  "tool_calls": {
+   "bash": 11,
+   "advisor": 1
+  },
+  "writes": [],
+  "per_turn": [
+   {
+    "turn": 1,
+    "context_tokens": 2532,
+    "output_tokens": 163,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 2,
+    "context_tokens": 3669,
+    "output_tokens": 203,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 3,
+    "context_tokens": 6652,
+    "output_tokens": 2146,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 4,
+    "context_tokens": 8103,
+    "output_tokens": 1131,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 5,
+    "context_tokens": 9795,
+    "output_tokens": 1556,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 6,
+    "context_tokens": 12950,
+    "output_tokens": 2974,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 7,
+    "context_tokens": 16571,
+    "output_tokens": 3269,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 8,
+    "context_tokens": 24841,
+    "output_tokens": 8015,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 9,
+    "context_tokens": 28347,
+    "output_tokens": 3410,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 10,
+    "context_tokens": 36942,
+    "output_tokens": 8424,
+    "stop": "length"
+   }
+  ]
+ },
+ "run3": {
+  "desc": "build after context raise",
+  "max_context": 262144,
+  "turns": 105,
+  "final_stop": "stop",
+  "peak_context": 119724,
+  "tool_calls": {
+   "bash": 77,
+   "write": 11,
+   "edit": 16,
+   "read": 3,
+   "advisor": 1
+  },
+  "writes": [
+   "write iss-tracker/src/solar.js",
+   "edit iss-tracker/src/solar.js",
+   "write iss-tracker/src/track.js",
+   "write iss-tracker/index.html",
+   "edit iss-tracker/index.html",
+   "edit iss-tracker/src/track.js",
+   "write iss-tracker/serve.js",
+   "edit iss-tracker/index.html",
+   "write iss-tracker/tests/test.mjs",
+   "edit iss-tracker/tests/test.mjs",
+   "edit iss-tracker/index.html",
+   "edit iss-tracker/index.html",
+   "edit iss-tracker/index.html",
+   "write iss-tracker/tests/verify_render.py",
+   "edit iss-tracker/index.html",
+   "write iss-tracker/tests/verify_render.py",
+   "write iss-tracker/tests/verify_render.py",
+   "edit iss-tracker/index.html",
+   "edit iss-tracker/tests/verify_render.py",
+   "write iss-tracker/tests/verify_render.py",
+   "edit iss-tracker/index.html",
+   "edit iss-tracker/index.html",
+   "edit iss-tracker/index.html",
+   "write iss-tracker/tests/verify_render.py",
+   "edit iss-tracker/index.html",
+   "write iss-tracker/README.md",
+   "edit iss-tracker/index.html"
+  ],
+  "per_turn": [
+   {
+    "turn": 1,
+    "context_tokens": 3245,
+    "output_tokens": 148,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 2,
+    "context_tokens": 4337,
+    "output_tokens": 129,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 3,
+    "context_tokens": 8705,
+    "output_tokens": 3731,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 4,
+    "context_tokens": 11070,
+    "output_tokens": 1997,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 5,
+    "context_tokens": 11605,
+    "output_tokens": 440,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 6,
+    "context_tokens": 12674,
+    "output_tokens": 761,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 7,
+    "context_tokens": 13107,
+    "output_tokens": 395,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 8,
+    "context_tokens": 19171,
+    "output_tokens": 5829,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 9,
+    "context_tokens": 19832,
+    "output_tokens": 523,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 10,
+    "context_tokens": 22553,
+    "output_tokens": 2489,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 11,
+    "context_tokens": 32665,
+    "output_tokens": 10080,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 12,
+    "context_tokens": 34688,
+    "output_tokens": 1993,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 13,
+    "context_tokens": 35444,
+    "output_tokens": 720,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 14,
+    "context_tokens": 36558,
+    "output_tokens": 923,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 15,
+    "context_tokens": 37350,
+    "output_tokens": 754,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 16,
+    "context_tokens": 38420,
+    "output_tokens": 925,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 17,
+    "context_tokens": 38851,
+    "output_tokens": 144,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 18,
+    "context_tokens": 39087,
+    "output_tokens": 218,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 19,
+    "context_tokens": 39326,
+    "output_tokens": 133,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 20,
+    "context_tokens": 39886,
+    "output_tokens": 282,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 21,
+    "context_tokens": 40912,
+    "output_tokens": 796,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 22,
+    "context_tokens": 42802,
+    "output_tokens": 1854,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 23,
+    "context_tokens": 43016,
+    "output_tokens": 182,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 24,
+    "context_tokens": 44034,
+    "output_tokens": 520,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 25,
+    "context_tokens": 44377,
+    "output_tokens": 261,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 26,
+    "context_tokens": 44665,
+    "output_tokens": 250,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 27,
+    "context_tokens": 45148,
+    "output_tokens": 434,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 28,
+    "context_tokens": 45603,
+    "output_tokens": 238,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 29,
+    "context_tokens": 45977,
+    "output_tokens": 177,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 30,
+    "context_tokens": 46481,
+    "output_tokens": 470,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 31,
+    "context_tokens": 47113,
+    "output_tokens": 345,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 32,
+    "context_tokens": 47894,
+    "output_tokens": 503,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 33,
+    "context_tokens": 48374,
+    "output_tokens": 336,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 34,
+    "context_tokens": 48882,
+    "output_tokens": 408,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 35,
+    "context_tokens": 50760,
+    "output_tokens": 1651,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 36,
+    "context_tokens": 51504,
+    "output_tokens": 708,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 37,
+    "context_tokens": 51804,
+    "output_tokens": 264,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 38,
+    "context_tokens": 54482,
+    "output_tokens": 2642,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 39,
+    "context_tokens": 54785,
+    "output_tokens": 270,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 40,
+    "context_tokens": 55158,
+    "output_tokens": 158,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 41,
+    "context_tokens": 56894,
+    "output_tokens": 1521,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 42,
+    "context_tokens": 57362,
+    "output_tokens": 432,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 43,
+    "context_tokens": 58870,
+    "output_tokens": 1400,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 44,
+    "context_tokens": 58960,
+    "output_tokens": 57,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 45,
+    "context_tokens": 62501,
+    "output_tokens": 3455,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 46,
+    "context_tokens": 62844,
+    "output_tokens": 310,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 47,
+    "context_tokens": 0,
+    "output_tokens": 0,
+    "stop": "error"
+   },
+   {
+    "turn": 48,
+    "context_tokens": 0,
+    "output_tokens": 0,
+    "stop": "error"
+   },
+   {
+    "turn": 49,
+    "context_tokens": 0,
+    "output_tokens": 0,
+    "stop": "error"
+   },
+   {
+    "turn": 50,
+    "context_tokens": 63726,
+    "output_tokens": 737,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 51,
+    "context_tokens": 64502,
+    "output_tokens": 402,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 52,
+    "context_tokens": 65271,
+    "output_tokens": 344,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 53,
+    "context_tokens": 66448,
+    "output_tokens": 840,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 54,
+    "context_tokens": 67041,
+    "output_tokens": 557,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 55,
+    "context_tokens": 67562,
+    "output_tokens": 418,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 56,
+    "context_tokens": 68141,
+    "output_tokens": 454,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 57,
+    "context_tokens": 68384,
+    "output_tokens": 191,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 58,
+    "context_tokens": 68555,
+    "output_tokens": 92,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 59,
+    "context_tokens": 70656,
+    "output_tokens": 1593,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 60,
+    "context_tokens": 70896,
+    "output_tokens": 207,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 61,
+    "context_tokens": 71335,
+    "output_tokens": 260,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 62,
+    "context_tokens": 73588,
+    "output_tokens": 2084,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 63,
+    "context_tokens": 73720,
+    "output_tokens": 83,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 64,
+    "context_tokens": 73919,
+    "output_tokens": 92,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 65,
+    "context_tokens": 74952,
+    "output_tokens": 932,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 66,
+    "context_tokens": 75103,
+    "output_tokens": 102,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 67,
+    "context_tokens": 76081,
+    "output_tokens": 748,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 68,
+    "context_tokens": 78515,
+    "output_tokens": 2398,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 69,
+    "context_tokens": 79225,
+    "output_tokens": 677,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 70,
+    "context_tokens": 80026,
+    "output_tokens": 538,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 71,
+    "context_tokens": 80520,
+    "output_tokens": 292,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 72,
+    "context_tokens": 81288,
+    "output_tokens": 626,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 73,
+    "context_tokens": 83149,
+    "output_tokens": 1778,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 74,
+    "context_tokens": 84358,
+    "output_tokens": 849,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 75,
+    "context_tokens": 88072,
+    "output_tokens": 3424,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 76,
+    "context_tokens": 89409,
+    "output_tokens": 1003,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 77,
+    "context_tokens": 90096,
+    "output_tokens": 604,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 78,
+    "context_tokens": 91886,
+    "output_tokens": 1656,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 79,
+    "context_tokens": 92998,
+    "output_tokens": 883,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 80,
+    "context_tokens": 94735,
+    "output_tokens": 1615,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 81,
+    "context_tokens": 95488,
+    "output_tokens": 725,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 82,
+    "context_tokens": 96428,
+    "output_tokens": 734,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 83,
+    "context_tokens": 97418,
+    "output_tokens": 894,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 84,
+    "context_tokens": 98379,
+    "output_tokens": 746,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 85,
+    "context_tokens": 99756,
+    "output_tokens": 1166,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 86,
+    "context_tokens": 100872,
+    "output_tokens": 1045,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 87,
+    "context_tokens": 101160,
+    "output_tokens": 185,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 88,
+    "context_tokens": 101805,
+    "output_tokens": 563,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 89,
+    "context_tokens": 102252,
+    "output_tokens": 411,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 90,
+    "context_tokens": 103278,
+    "output_tokens": 871,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 91,
+    "context_tokens": 104260,
+    "output_tokens": 892,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 92,
+    "context_tokens": 105527,
+    "output_tokens": 1092,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 93,
+    "context_tokens": 106231,
+    "output_tokens": 401,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 94,
+    "context_tokens": 106964,
+    "output_tokens": 484,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 95,
+    "context_tokens": 107436,
+    "output_tokens": 259,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 96,
+    "context_tokens": 108432,
+    "output_tokens": 191,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 97,
+    "context_tokens": 109267,
+    "output_tokens": 43,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 98,
+    "context_tokens": 112773,
+    "output_tokens": 3400,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 99,
+    "context_tokens": 114543,
+    "output_tokens": 1142,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 100,
+    "context_tokens": 115459,
+    "output_tokens": 880,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 101,
+    "context_tokens": 116440,
+    "output_tokens": 899,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 102,
+    "context_tokens": 117270,
+    "output_tokens": 711,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 103,
+    "context_tokens": 118165,
+    "output_tokens": 755,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 104,
+    "context_tokens": 118941,
+    "output_tokens": 412,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 105,
+    "context_tokens": 119724,
+    "output_tokens": 766,
+    "stop": "stop"
+   }
+  ]
+ },
+ "run4": {
+  "desc": "4 visual fixes",
+  "max_context": 262144,
+  "turns": 22,
+  "final_stop": "stop",
+  "peak_context": 53861,
+  "tool_calls": {
+   "bash": 19,
+   "read": 4,
+   "edit": 2
+  },
+  "writes": [
+   "edit index.html",
+   "edit index.html"
+  ],
+  "per_turn": [
+   {
+    "turn": 1,
+    "context_tokens": 3400,
+    "output_tokens": 103,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 2,
+    "context_tokens": 4432,
+    "output_tokens": 40,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 3,
+    "context_tokens": 16336,
+    "output_tokens": 3282,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 4,
+    "context_tokens": 18088,
+    "output_tokens": 89,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 5,
+    "context_tokens": 28623,
+    "output_tokens": 7966,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 6,
+    "context_tokens": 30401,
+    "output_tokens": 1609,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 7,
+    "context_tokens": 36090,
+    "output_tokens": 4824,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 8,
+    "context_tokens": 36905,
+    "output_tokens": 789,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 9,
+    "context_tokens": 37277,
+    "output_tokens": 346,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 10,
+    "context_tokens": 37732,
+    "output_tokens": 437,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 11,
+    "context_tokens": 39670,
+    "output_tokens": 1800,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 12,
+    "context_tokens": 40149,
+    "output_tokens": 302,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 13,
+    "context_tokens": 40897,
+    "output_tokens": 608,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 14,
+    "context_tokens": 41337,
+    "output_tokens": 263,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 15,
+    "context_tokens": 43251,
+    "output_tokens": 1744,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 16,
+    "context_tokens": 45022,
+    "output_tokens": 1448,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 17,
+    "context_tokens": 46083,
+    "output_tokens": 806,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 18,
+    "context_tokens": 48622,
+    "output_tokens": 1751,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 19,
+    "context_tokens": 50339,
+    "output_tokens": 1384,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 20,
+    "context_tokens": 51549,
+    "output_tokens": 831,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 21,
+    "context_tokens": 52417,
+    "output_tokens": 195,
+    "stop": "toolUse"
+   },
+   {
+    "turn": 22,
+    "context_tokens": 53861,
+    "output_tokens": 569,
+    "stop": "stop"
+   }
+  ]
+ }
+}

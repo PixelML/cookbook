@@ -1,0 +1,8 @@
+The ISS tracker in this folder works (index.html, src/solar.js, src/track.js, serve.js on :5173). Data is correct; do not change the solar or ISS math. Fix only these 4 visual problems in index.html, then stop:
+
+1. Opening view: on load, point the camera so the ISS beacon is visible (e.g. start in FOLLOW ISS mode or orient the camera toward the ISS position after the first fetch). The night/day terminator should also be visible in the opening view.
+2. Atmosphere rim: it renders as a flat, thick, solid blue ring. Replace it with a thin, soft Fresnel-style glow (additive, BackSide, intensity falling off at the limb).
+3. A bright sun-glare sprite sits at the top-left of the screen and the title text overlaps the globe. Remove or correctly place the glare (it must sit along the real sun direction, behind the globe from the camera when the sub-solar point faces the camera), and keep the title clear of the globe (smaller globe in view or move the title).
+4. Typo: "SUB-SOLATIC" must be "SUB-SOLAR" (2 places).
+
+Make small, targeted edits. Do not download anything. Do not rewrite the files from scratch. When done, reply with a 3-line summary of what changed.

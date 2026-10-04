@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ISS Orbital Tracker — Live Solar Ephemeris</title>
+<style>
+  :root {
+    --bg: #05070c;
+    --panel: rgba(12, 18, 28, 0.62);
+    --line: rgba(120, 170, 220, 0.18);
+    --ink: #d7e4f2;
+    --dim: #7c8ea3;
+    --accent: #6ee7ff;
+    --amber: #ffb86b;
+    --good: #4ade80;
+    --bad: #ff6b6b;
+    --mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--ink); font-family: var(--mono); overflow: hidden; }
+  #scene { position: fixed; inset: 0; display: block; }
+
+  .hud { position: fixed; inset: 0; pointer-events: none; display: flex; flex-direction: column; }
+  .hud > * { pointer-events: none; }
+
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 18px; gap: 16px;
+  }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand h1 { font-size: 13px; letter-spacing: 0.22em; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.75); }
+  .brand span { font-size: 10px; color: var(--dim); letter-spacing: 0.16em; }
+  .clock { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+  .led { width: 8px; height: 8px; border-radius: 50%; background: var(--good); box-shadow: 0 0 10px var(--good); }
+  .led.err { background: var(--bad); box-shadow: 0 0 10px var(--bad); }
+
+  .panels { display: flex; justify-content: space-between; align-items: flex-start; padding: 0 18px; flex: 1; }
+  .panel {
+    width: 268px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px 14px 12px; backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+  }
+  .panel h2 {
+    font-size: 10px; letter-spacing: 0.2em; color: var(--accent); font-weight: 600;
+    margin-bottom: 10px; display: flex; justify-content: space-between;
+  }
+  .panel h2 em { font-style: normal; color: var(--dim); letter-spacing: 0.1em; }
+  .row { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .row:last-child { border-bottom: 0; }
+  .k { font-size: 10px; color: var(--dim); letter-spacing: 0.12em; }
+  .v { font-size: 13px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .v.big { font-size: 17px; color: var(--accent); }
+  .v.amber { color: var(--amber); }
+
+  .mini { margin-top: 10px; }
+  canvas.map { width: 100%; height: auto; display: block; border-radius: 8px; background: #071019; border: 1px solid var(--line); }
+
+  footer { display: flex; align-items: center; gap: 14px; padding: 12px 18px 16px; }
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; }
+  button {
+    pointer-events: auto; font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+    color: var(--ink); background: rgba(255,255,255,0.06); border: 1px solid var(--line);
+    border-radius: 8px; padding: 7px 11px; cursor: pointer; transition: 0.18s;
+  }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  button.on { background: rgba(110,231,255,0.14); border-color: rgba(110,231,255,0.5); color: var(--accent); }
+  .meter { flex: 1; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.08); overflow: hidden; min-width: 120px; }
+  .meter i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), rgba(110,231,255,0.2)); }
+  .note { font-size: 10px; color: var(--dim); letter-spacing: 0.1em; }
+  .warn { color: var(--bad); }
+</style>
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<div class="hud">
+  <header>
+    <div class="brand">
+      <h1>ISS ORBITAL TRACKER</h1>
+      <span>NAV / REAL-TIME SOLAR EPHEMERIS</span>
+    </div>
+    <div class="clock"><i class="led" id="led"></i><span id="utc">—</span></div>
+  </header>
+
+  <div class="panels">
+    <section class="panel">
+      <h2>TELEMETRY <em>25544</em></h2>
+      <div class="row"><span class="k">LATITUDE</span><span class="v big" id="lat">—</span></div>
+      <div class="row"><span class="k">LONGITUDE</span><span class="v big" id="lon">—</span></div>
+      <div class="row"><span class="k">ALTITUDE</span><span class="v" id="alt">—</span></div>
+      <div class="row"><span class="k">VELOCITY</span><span class="v amber" id="vel">—</span></div>
+      <div class="row"><span class="k">DERIVED GS</span><span class="v" id="gs">—</span></div>
+      <div class="row"><span class="k">FOOTPRINT</span><span class="v" id="foot">—</span></div>
+      <div class="row"><span class="k">VISIBILITY</span><span class="v" id="vis">—</span></div>
+      <div class="row"><span class="k">SUN ELEVATION</span><span class="v" id="elev">—</span></div>
+      <div class="mini"><canvas class="map" id="map" width="240" height="120"></canvas></div>
+    </section>
+
+    <section class="panel">
+      <h2>SOLAR EPHEMERIS <em>UTC</em></h2>
+      <div class="row"><span class="k">SUB-SOLAR LAT</span><span class="v" id="slat">—</span></div>
+      <div class="row"><span class="k">SUB-SOLAR LON</span><span class="v" id="slon">—</span></div>
+      <div class="row"><span class="k">GMST</span><span class="v" id="gmst">—</span></div>
+      <div class="row"><span class="k">SOLAR DISTANCE</span><span class="v" id="sdist">—</span></div>
+      <div class="row"><span class="k">ISS LOCAL TIME</span><span class="v" id="local">—</span></div>
+      <div class="row"><span class="k">STATE</span><span class="v amber" id="state">—</span></div>
+      <div class="row"><span class="k">LAST SAMPLE</span><span class="v" id="last">—</span></div>
+    </section>
+  </div>
+
+  <footer>
+    <div class="controls">
+      <button id="btnFollow" class="on">FOLLOW ISS</button>
+      <button id="btnTrail" class="on">GROUND TRACK</button>
+      <button id="btnScale">TRUE SCALE</button>
+      <button id="btnReset">RESET VIEW</button>
+    </div>
+    <div class="meter"><i id="bar"></i></div>
+    <span class="note" id="next">next sample 5.0 s</span>
+  </footer>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "./node_modules/three/build/three.module.js",
+    "three/addons/": "./node_modules/three/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { solarPosition, solarElevation } from './src/solar.js';
+import { latLonToVec3, groundTrackRate, derivedSpeedKmH, propagate } from './src/track.js';
+
+const EARTH_R = 1;            // scene units
+const KM_PER_UNIT = 6371;     // true scale: 1 unit = 6371 km
+const API = 'https://api.wheretheiss.at/v1/satellites/25544';
+const PERIOD = 5000;
+const el = (id) => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+// ?t=<epoch ms> freezes the clock and ?lat=&lon= overrides the position: deterministic render tests.
+const clockOffset = params.get('t') ? Number(params.get('t')) - Date.now() : 0;
+const nowMs = () => Date.now() + clockOffset;
+const sim = params.get('lat') != null ? { lat: Number(params.get('lat')), lon: Number(params.get('lon')) } : null;
+
+/* ---------- renderer ---------- */
+const canvas = document.getElementById('scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.001, 600);
+const VIEW_DIST = 4.2;   // globe smaller in frame, so the title stays clear of it
+const MIN_OFF_SUN = 1.0; // rad: keeps the day/night terminator in the opening frame
+const V3 = (o) => new THREE.Vector3(o.x, o.y, o.z);
+
+/** Bisector of the beacon and the sub-solar point, kept off the sun axis so the terminator is in frame. */
+function openingDir(issDir, sunVec) {
+  const d = issDir.clone().add(sunVec.clone().multiplyScalar(0.7)).normalize();
+  const a = d.angleTo(sunVec);
+  if (a >= MIN_OFF_SUN) return d;
+  const u = d.clone().add(sunVec.clone().multiplyScalar(-Math.cos(a))).normalize();
+  return sunVec.clone().multiplyScalar(Math.cos(MIN_OFF_SUN)).add(u.multiplyScalar(Math.sin(MIN_OFF_SUN))).normalize();
+}
+const startSun = solarPosition(nowMs());
+camera.position.copy(openingDir(V3(latLonToVec3(sim ? sim.lat : 0, sim ? sim.lon : 0, 1)), V3(startSun.dir)).multiplyScalar(VIEW_DIST));
+// ?cam=lat,lon places the camera over a fixed point (used by the render test)
+const camParam = params.get('cam');
+if (camParam) {
+  const [clat, clon] = camParam.split(',').map(Number);
+  const u = latLonToVec3(clat, clon, 2.4);
+  camera.position.set(u.x, u.y, u.z);
+}
+
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 1.05;
+controls.maxDistance = 12;
+controls.rotateSpeed = 0.55;
+
+/* ---------- textures ---------- */
+const loader = new THREE.TextureLoader();
+const tex = (url, srgb = true) => {
+  const t = loader.load(url);
+  t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+  t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  return t;
+};
+const dayTex = tex('assets/textures/blue_marble_2048.jpg');
+const nightTex = tex('assets/textures/earth_night_4096.jpg');
+const lightsTex = tex('assets/textures/earth_lights_2048.png');
+const cloudsTex = tex('assets/textures/earth_clouds_4096.jpg');
+const normalTex = tex('assets/textures/earth_normal_2048.jpg', false);
+
+/* ---------- earth ---------- */
+const sunDir = new THREE.Vector3(1, 0, 0);
+
+const earthMat = new THREE.MeshStandardMaterial({
+  map: dayTex,
+  normalMap: normalTex,
+  normalScale: new THREE.Vector2(0.55, 0.55),
+  roughness: 0.78,
+  metalness: 0.0,
+  emissive: new THREE.Color(0xffffff),
+  emissiveMap: lightsTex,
+  emissiveIntensity: 1.0,
+});
+
+earthMat.onBeforeCompile = (sh) => {
+  sh.uniforms.uSunDir = { value: sunDir };
+  sh.uniforms.uNightTex = { value: nightTex };
+  sh.uniforms.uNightGain = { value: 0.22 };
+  sh.uniforms.uLightGain = { value: 0.9 };
+
+  sh.vertexShader = sh.vertexShader
+    .replace('#include <common>', '#include <common>\nvarying vec3 vWorldNormal;')
+    .replace('#include <begin_vertex>', '#include <begin_vertex>\nvWorldNormal = normalize(mat3(modelMatrix) * normal);');
+
+  sh.fragmentShader = sh.fragmentShader
+    .replace('#include <common>', `#include <common>
+      uniform vec3 uSunDir;
+      uniform sampler2D uNightTex;
+      uniform float uNightGain;
+      uniform float uLightGain;
+      varying vec3 vWorldNormal;
+      float dayFactor(vec3 n) { return smoothstep(-0.06, 0.16, dot(n, uSunDir)); }`)
+    .replace('#include <map_fragment>', `#ifdef USE_MAP
+      vec3 dayColor = texture2D( map, vMapUv ).rgb;
+      float df = dayFactor( normalize( vWorldNormal ) );
+      vec3 nightColor = texture2D( uNightTex, vMapUv ).rgb * uNightGain;
+      diffuseColor.rgb *= mix( nightColor * 0.35, dayColor, df );
+    #endif`)
+    .replace('#include <emissivemap_fragment>', `#ifdef USE_EMISSIVEMAP
+      vec3 lights = texture2D( emissiveMap, vEmissiveMapUv ).rgb;
+      lights = max( vec3( 0.0 ), lights - 0.03 );
+      float dfE = dayFactor( normalize( vWorldNormal ) );
+      totalEmissiveRadiance *= lights * uLightGain * ( 1.0 - dfE );
+    #endif`);
+};
+
+const earth = new THREE.Mesh(new THREE.SphereGeometry(EARTH_R, 128, 96), earthMat);
+scene.add(earth);
+
+const clouds = new THREE.Mesh(
+  new THREE.SphereGeometry(EARTH_R * 1.006, 96, 64),
+  new THREE.MeshStandardMaterial({
+    alphaMap: cloudsTex, transparent: true, depthWrite: false,
+    color: 0xf2f6ff, roughness: 1, metalness: 0, opacity: 0.55,
+  })
+);
+scene.add(clouds);
+
+/* atmosphere shell: thin soft fresnel glow, additive, intensity falls off toward the limb */
+const atmoMat = new THREE.ShaderMaterial({
+  transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide,
+  uniforms: {
+    uSunDir: { value: sunDir }, uColor: { value: new THREE.Color(0x6fa8d8) },
+    uInner: { value: EARTH_R }, uOuter: { value: EARTH_R * 1.03 }, uGain: { value: 0.5 },
+  },
+  vertexShader: `
+    varying vec3 vPos;
+    void main() {
+      vPos = ( modelMatrix * vec4( position, 1.0 ) ).xyz;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    }`,
+  fragmentShader: `
+    uniform vec3 uSunDir; uniform vec3 uColor;
+    uniform float uInner; uniform float uOuter; uniform float uGain;
+    varying vec3 vPos;
+    void main() {
+      vec3 n = normalize( vPos );
+      vec3 toCam = cameraPosition - vPos;
+      float dist = max( 1e-4, length( toCam ) );
+      // Impact parameter of the view ray: uInner at the disc centre, uOuter at the limb.
+      float b = length( cross( vPos, toCam ) ) / dist;
+      // Path length through the shell: max at the disc edge, 0 at the limb -> soft falloff.
+      float tmax = sqrt( max( 1e-6, uOuter * uOuter - uInner * uInner ) );
+      float t = sqrt( max( 0.0, uOuter * uOuter - b * b ) ) - sqrt( max( 0.0, uInner * uInner - b * b ) );
+      float dens = pow( clamp( t / tmax, 0.0, 1.0 ), 1.8 );
+      float sun = smoothstep( -0.3, 0.35, dot( n, uSunDir ) );
+      float g = dens * ( 0.18 + 0.82 * sun ) * uGain;
+      if ( g <= 0.002 ) discard;
+      gl_FragColor = vec4( uColor * g, g );
+    }`,
+});
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(EARTH_R * 1.03, 64, 48), atmoMat));
+
+/* ---------- lighting from the ephemeris ---------- */
+const sunLight = new THREE.DirectionalLight(0xfff4e6, 3.2);
+scene.add(sunLight);
+scene.add(new THREE.AmbientLight(0x2a3a52, 0.08));
+
+/* sun disc, placed by the ephemeris (not an artistic rotation) */
+function radialSprite(inner, outer, size = 256) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const g = c.getContext('2d').createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  g.addColorStop(0, inner); g.addColorStop(0.35, outer); g.addColorStop(1, 'rgba(0,0,0,0)');
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, size, size);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+// Small point on the real sun direction. depthTest stays on, so the globe occludes it
+// when the sub-solar point faces the camera; it is never an overlay in the corner.
+const sunSprite = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: radialSprite('rgba(255,255,255,1)', 'rgba(255,214,150,0.55)'),
+  blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, depthTest: true,
+}));
+sunSprite.scale.setScalar(3);
+scene.add(sunSprite);
+
+/* ---------- stars ---------- */
+const starGeo = new THREE.BufferGeometry();
+const N = 4000, sp = new Float32Array(N * 3), sc = new Float32Array(N * 3);
+for (let i = 0; i < N; i++) {
+  const u = Math.random() * 2 - 1, a = Math.random() * Math.PI * 2, r = 150 + Math.random() * 60;
+  const s = Math.sqrt(1 - u * u);
+  sp[i * 3] = r * s * Math.cos(a); sp[i * 3 + 1] = r * u; sp[i * 3 + 2] = r * s * Math.sin(a);
+  const b = 0.35 + Math.random() * 0.65;
+  sc[i * 3] = b; sc[i * 3 + 1] = b * (0.9 + Math.random() * 0.1); sc[i * 3 + 2] = b * (1.0 + Math.random() * 0.05);
+}
+starGeo.setAttribute('position', new THREE.BufferAttribute(sp, 3));
+starGeo.setAttribute('color', new THREE.BufferAttribute(sc, 3));
+scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({
+  size: 0.55, vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true,
+})));
+
+/* ---------- ISS beacon ---------- */
+const iss = new THREE.Group();
+const core = new THREE.Mesh(
+  new THREE.SphereGeometry(0.0075, 32, 32),
+  new THREE.MeshPhysicalMaterial({
+    color: 0xbfe8ff, transmission: 0.9, thickness: 0.02, ior: 1.45, roughness: 0.06,
+    transparent: true, emissive: 0x7fd8ff, emissiveIntensity: 3.2, metalness: 0,
+  })
+);
+iss.add(core);
+
+const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: radialSprite('rgba(180,240,255,0.95)', 'rgba(110,231,255,0.35)'),
+  blending: THREE.AdditiveBlending, transparent: true, depthWrite: false,
+}));
+halo.scale.setScalar(0.06);
+iss.add(halo);
+
+const ring = new THREE.Mesh(
+  new THREE.TorusGeometry(0.016, 0.0006, 8, 96),
+  new THREE.MeshBasicMaterial({ color: 0x6ee7ff, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false })
+);
+iss.add(ring);
+
+const ring2 = new THREE.Mesh(
+  new THREE.TorusGeometry(0.024, 0.0004, 8, 96),
+  new THREE.MeshBasicMaterial({ color: 0x6ee7ff, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending, depthWrite: false })
+);
+iss.add(ring2);
+
+scene.add(iss);
+
+const beamMat = new THREE.LineBasicMaterial({ color: 0x6ee7ff, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending });
+const beam = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]), beamMat);
+scene.add(beam);
+
+const groundDot = new THREE.Mesh(
+  new THREE.CircleGeometry(0.006, 32),
+  new THREE.MeshBasicMaterial({ color: 0x6ee7ff, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false })
+);
+scene.add(groundDot);
+
+/* ground track */
+const MAX_TRAIL = 1440;
+const trailGeo = new THREE.BufferGeometry();
+const trailPos = new Float32Array(MAX_TRAIL * 3);
+const trailCol = new Float32Array(MAX_TRAIL * 3);
+trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3));
+trailGeo.setAttribute('color', new THREE.BufferAttribute(trailCol, 3));
+trailGeo.setDrawRange(0, 0);
+const trail = new THREE.Line(trailGeo, new THREE.LineBasicMaterial({
+  vertexColors: true, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending,
+}));
+scene.add(trail);
+
+/* ---------- post processing ---------- */
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.7, 0.5, 0.7);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+/* ---------- state ---------- */
+let prev = null, curr = null, rate = null;
+let lastFetch = nowMs(), nextAt = lastFetch + PERIOD;
+let follow = params.get('follow') !== '0';
+let showTrail = params.get('trail') !== '0';
+let trueScale = params.get('scale') !== '0';
+let statusOk = true;
+let opened = false;
+function applyOpeningView(issDir) {
+  if (camParam) return;
+  camera.position.copy(openingDir(issDir, V3(solarPosition(nowMs()).dir)).multiplyScalar(VIEW_DIST));
+  controls.target.set(0, 0, 0);
+}
+if (!follow) el('btnFollow').classList.remove('on');
+if (!showTrail) { el('btnTrail').classList.remove('on'); trail.visible = false; }
+if (trueScale) el('btnScale').classList.add('on');
+
+/* ---------- minimap ---------- */
+const map = document.getElementById('map');
+const mctx = map.getContext('2d');
+const mapImg = new Image();
+mapImg.onload = () => drawMap();
+mapImg.src = 'assets/textures/blue_marble_2048.jpg';
+
+function drawMap() {
+  const w = map.width, h = map.height;
+  mctx.clearRect(0, 0, w, h);
+  if (mapImg.complete && mapImg.naturalWidth) mctx.drawImage(mapImg, 0, 0, w, h);
+
+  if (curr) {
+    const s = solarPosition(nowMs());
+    const d = s.dir;
+    // Night shading: test each pixel against the ephemeris (same function as the panel).
+    const img = mctx.getImageData(0, 0, w, h);
+    const data = img.data;
+    for (let y = 0; y < h; y++) {
+      const phi = (90 - (y / h) * 180) * Math.PI / 180;
+      const cp = Math.cos(phi), sp = Math.sin(phi);
+      for (let x = 0; x < w; x++) {
+        const lam = ((x / w) * 360 - 180) * Math.PI / 180;
+        const e = cp * Math.cos(lam) * d.x + sp * d.y - cp * Math.sin(lam) * d.z;
+        if (e < 0) {
+          const k = e > -0.15 ? 0.45 : 0.18;   // soft terminator
+          const i = (y * w + x) * 4;
+          data[i] *= k; data[i + 1] *= k; data[i + 2] *= k;
+        }
+      }
+    }
+    mctx.putImageData(img, 0, 0);
+
+    // sub-solar point
+    const sx = ((s.subsolar.lon + 180) / 360) * w, sy2 = ((90 - s.subsolar.lat) / 180) * h;
+    mctx.fillStyle = '#ffb86b';
+    mctx.beginPath(); mctx.arc(sx, sy2, 3, 0, 7); mctx.fill();
+    // ISS
+    const ix = ((curr.longitude + 180) / 360) * w, iy = ((90 - curr.latitude) / 180) * h;
+    mctx.strokeStyle = 'rgba(110,231,255,0.85)'; mctx.lineWidth = 1;
+    mctx.beginPath(); mctx.arc(ix, iy, 5, 0, 7); mctx.stroke();
+    mctx.fillStyle = '#6ee7ff';
+    mctx.beginPath(); mctx.arc(ix, iy, 2, 0, 7); mctx.fill();
+  }
+}
+
+/* ---------- fetch loop ---------- */
+async function fetchISS() {
+  if (sim) {
+    prev = curr;
+    curr = {
+      latitude: sim.lat, longitude: sim.lon, altitude: 417.5, velocity: 27580,
+      visibility: 'daylight', footprint: 4500, timestamp: Math.round(nowMs() / 1000),
+    };
+    if (prev) {
+      rate = groundTrackRate(prev, curr);
+      samples.push({ lat: curr.latitude, lon: curr.longitude, alt: curr.altitude });
+      rebuildTrail();
+    }
+    statusOk = true;
+    drawMap();
+    return;
+  }
+  try {
+    const res = await fetch(API, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const d = await res.json();
+    prev = curr;
+    curr = d;
+    if (prev) {
+      rate = groundTrackRate(prev, curr);
+      samples.push({ lat: curr.latitude, lon: curr.longitude, alt: curr.altitude });
+      if (samples.length > MAX_TRAIL) samples.shift();
+      rebuildTrail();
+      document.getElementById('gs').textContent = derivedSpeedKmH(prev, curr).toFixed(1) + ' km/h';
+    }
+    statusOk = true;
+    document.getElementById('last').textContent = new Date(d.timestamp * 1000).toISOString().slice(11, 19) + 'Z';
+  } catch (e) {
+    statusOk = false;
+    document.getElementById('last').textContent = 'ERR: ' + e.message;
+  }
+  lastFetch = nowMs();
+  nextAt = lastFetch + PERIOD;
+  drawMap();
+}
+
+const samples = [];
+function rebuildTrail() {
+  const n = samples.length;
+  for (let i = 0; i < n; i++) {
+    const s = samples[i];
+    const v = latLonToVec3(s.lat, s.lon, (EARTH_R + s.alt / KM_PER_UNIT) * (trueScale ? 1 : 8));
+    trailPos[i * 3] = v.x; trailPos[i * 3 + 1] = v.y; trailPos[i * 3 + 2] = v.z;
+    const f = 0.12 + 0.88 * (i / Math.max(1, n - 1));
+    trailCol[i * 3] = 0.43 * f; trailCol[i * 3 + 1] = 0.9 * f; trailCol[i * 3 + 2] = 1.0 * f;
+  }
+  trailGeo.setDrawRange(0, n);
+  trailGeo.attributes.position.needsUpdate = true;
+  trailGeo.attributes.color.needsUpdate = true;
+}
+
+fetchISS();
+setInterval(fetchISS, PERIOD);
+
+/* ---------- UI ---------- */
+const fmtLat = (v) => `${v >= 0 ? 'N' : 'S'} ${Math.abs(v).toFixed(4)}°`;
+const fmtLon = (v) => `${v >= 0 ? 'E' : 'W'} ${Math.abs(v).toFixed(4)}°`;
+
+el('btnFollow').onclick = (e) => { follow = !follow; e.target.classList.toggle('on', follow); };
+el('btnTrail').onclick = (e) => { showTrail = !showTrail; e.target.classList.toggle('on', showTrail); trail.visible = showTrail; };
+el('btnScale').onclick = (e) => {
+  trueScale = !trueScale; e.target.classList.toggle('on', trueScale);
+  e.target.textContent = trueScale ? 'TRUE SCALE' : 'EXAGGERATED ×8';
+  rebuildTrail();
+};
+el('btnReset').onclick = () => {
+  applyOpeningView(curr ? V3(latLonToVec3(curr.latitude, curr.longitude, 1)) : new THREE.Vector3(0, 1, 0));
+};
+
+/* ---------- loop ---------- */
+const tmp = new THREE.Vector3();
+const UP = new THREE.Vector3(0, 0, 1);
+function frame() {
+  const now = nowMs();
+  const s = solarPosition(now);
+  sunDir.set(s.dir.x, s.dir.y, s.dir.z).normalize();
+
+  sunLight.position.set(sunDir.x * 60, sunDir.y * 60, sunDir.z * 60);
+  sunSprite.position.set(sunDir.x * 70, sunDir.y * 70, sunDir.z * 70);
+
+  if (curr) {
+    const p = rate ? propagate(curr, rate, now) : { lat: curr.latitude, lon: curr.longitude };
+    const k = trueScale ? 1 : 8;
+    const r = (EARTH_R + curr.altitude / KM_PER_UNIT) * k;
+    const v = latLonToVec3(p.lat, p.lon, r);
+    iss.position.set(v.x, v.y, v.z);
+    // Opening view: aim at the beacon once the first sample lands, kept off the sun axis
+    // so the day/night terminator is in frame.
+    if (!opened) { opened = true; applyOpeningView(V3(v).normalize()); }
+
+    const g = latLonToVec3(p.lat, p.lon, EARTH_R);
+    groundDot.position.set(g.x, g.y, g.z);
+    groundDot.quaternion.setFromUnitVectors(UP, new THREE.Vector3(g.x, g.y, g.z).normalize());
+    beam.geometry.attributes.position.setXYZ(0, g.x, g.y, g.z);
+    beam.geometry.attributes.position.setXYZ(1, v.x, v.y, v.z);
+    beam.geometry.attributes.position.needsUpdate = true;
+
+    ring.quaternion.setFromUnitVectors(UP, tmp.copy(camera.position).sub(iss.position).normalize());
+    ring2.quaternion.copy(ring.quaternion);
+
+    if (follow) controls.target.lerp(iss.position, 0.06);
+
+    const elev = solarElevation(p.lat, p.lon, now);
+    el('lat').textContent = fmtLat(p.lat);
+    el('lon').textContent = fmtLon(p.lon);
+    el('alt').textContent = curr.altitude.toFixed(1) + ' km';
+    el('vel').textContent = curr.velocity.toFixed(1) + ' km/h  ·  ' + (curr.velocity / 3.6).toFixed(0) + ' m/s';
+    el('foot').textContent = curr.footprint.toFixed(0) + ' km';
+    el('vis').textContent = curr.visibility;
+    el('elev').textContent = elev.toFixed(1) + '°';
+    el('state').textContent = elev > 0 ? 'DAYLIGHT' : 'EARTH SHADOW';
+    el('state').className = 'v ' + (elev > 0 ? 'amber' : '');
+    const solarHour = 12 + (s.subsolar.lon - p.lon) / 15;
+    el('local').textContent = ((solarHour % 24 + 24) % 24).toFixed(2) + ' h';
+  }
+
+  el('slat').textContent = fmtLat(s.subsolar.lat);
+  el('slon').textContent = fmtLon(s.subsolar.lon);
+  el('gmst').textContent = s.gmst.toFixed(2) + '°';
+  el('sdist').textContent = s.distanceAU.toFixed(5) + ' AU';
+  el('utc').textContent = new Date(now).toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+  el('led').className = 'led' + (statusOk ? '' : ' err');
+
+  const left = Math.max(0, nextAt - now);
+  el('bar').style.width = (100 - (left / PERIOD) * 100).toFixed(1) + '%';
+  el('next').textContent = 'next sample ' + (left / 1000).toFixed(1) + ' s';
+
+  controls.update();
+  composer.render();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  composer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
