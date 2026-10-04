@@ -1,0 +1,7 @@
+{
+  "name": "iss-tracker",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node serve.js" },
+  "dependencies": { "three": "0.170.0" }
+}

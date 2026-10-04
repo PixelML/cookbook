@@ -1,0 +1,3 @@
+{"label": "catalog-60", "skills": 60, "system_chars": {"preamble": 169, "tools": 442, "rules": 1507, "docs": 1409, "addendum": 1904, "skills": 31221, "cwd": 33}, "input_tokens": 11888}
+{"label": "no-skills", "skills": 0, "system_chars": {"preamble": 169, "tools": 442, "rules": 1507, "docs": 1409, "addendum": 1904, "cwd": 33}, "input_tokens": 2356}
+{"label": "core-compress-only", "skills": 1, "system_chars": {"preamble": 169, "tools": 442, "rules": 1507, "docs": 1409, "addendum": 1904, "skills": 972, "cwd": 33}, "input_tokens": 2587}

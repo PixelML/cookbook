@@ -1,0 +1,84 @@
+{
+ "warmup": [
+  {
+   "prompt_tokens": 15,
+   "completion_tokens": 10,
+   "ttft_s": 0.62,
+   "prefill_tok_s": 24.0,
+   "decode_tok_s": 35.3,
+   "tail": "Hello! How can I help you today?"
+  }
+ ],
+ "decode_short": [
+  {
+   "prompt_tokens": 30,
+   "completion_tokens": 205,
+   "ttft_s": 0.62,
+   "prefill_tok_s": 48.0,
+   "decode_tok_s": 39.5,
+   "tail": "roper resizing and load factor management are crucial to maintaining efficiency."
+  },
+  {
+   "prompt_tokens": 30,
+   "completion_tokens": 171,
+   "ttft_s": 0.44,
+   "prefill_tok_s": 68.0,
+   "decode_tok_s": 54.6,
+   "tail": "the table becomes too full, requiring frequent rehashing to maintain efficiency."
+  },
+  {
+   "prompt_tokens": 30,
+   "completion_tokens": 184,
+   "ttft_s": 0.44,
+   "prefill_tok_s": 69.0,
+   "decode_tok_s": 56.7,
+   "tail": "d, ensuring that every key remains uniquely retrievable despite hash collisions."
+  }
+ ],
+ "decode_long": [
+  {
+   "prompt_tokens": 45,
+   "completion_tokens": 1500,
+   "ttft_s": 0.73,
+   "prefill_tok_s": 62.0,
+   "decode_tok_s": 48.2,
+   "tail": "        \"error\": \"Rate limit exceeded\",\n                    \"retry_after\": 1,  #"
+  }
+ ],
+ "prefill_8k": [
+  {
+   "prompt_tokens": 10703,
+   "completion_tokens": 16,
+   "ttft_s": 9.19,
+   "prefill_tok_s": 1164.0,
+   "decode_tok_s": 28.8,
+   "tail": "ontains records that assign numerical values to pairs of specific terms, such as"
+  },
+  {
+   "prompt_tokens": 10708,
+   "completion_tokens": 16,
+   "ttft_s": 8.44,
+   "prefill_tok_s": 1269.0,
+   "decode_tok_s": 31.0,
+   "tail": "ontains records that assign numerical values to pairs of specific terms, such as"
+  }
+ ],
+ "prefill_32k": [
+  {
+   "prompt_tokens": 29250,
+   "completion_tokens": 16,
+   "ttft_s": 21.47,
+   "prefill_tok_s": 1362.0,
+   "decode_tok_s": 42.6,
+   "tail": "ontains records that assign numerical values to pairs of specific terms, such as"
+  },
+  {
+   "prompt_tokens": 29244,
+   "completion_tokens": 16,
+   "ttft_s": 21.58,
+   "prefill_tok_s": 1355.0,
+   "decode_tok_s": 48.2,
+   "tail": "ontains records that assign numerical values to pairs of specific terms, such as"
+  }
+ ]
+}

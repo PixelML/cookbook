@@ -11,6 +11,7 @@ Every number is labelled **measured** (our receipt), **community-reported**, or 
 | GLM-5.3-Flash NVFP4 (LibertAIDAI @11d73216) | 2x B200 TP2 | vLLM nightly 2026-09-06, Marlin MoE | pending | pending | ~2,300 (thinking on, inferred) | ~1.5 | [b200/glm-5.3-flash](b200/glm-5.3-flash/recipe.md) |
 | DeepSeek-V4.1-Flash (bf16/fp8, 475.3 GiB) | 4x B200 TP4+EP4 | SGLang @c4ca6511, DSPARK spec | 331.0 | **1,724.4** | not reachable | **4.03** (at c=16) | [b200/deepseek-v4.1-flash](b200/deepseek-v4.1-flash/recipe.md) |
 
+| Qwen3.8-Flash-Next IQ2_XS (ISTA-DASLab @ed59f920) | 1x RTX 3090 (consumer) | Strata @7df6cbc, 1 user | 48.2 | n/a | n/a | own hardware | [rtx3090/qwen3.8-flash-next-agentic](rtx3090/qwen3.8-flash-next-agentic/recipe.md) |
 Pricing basis: Modal list price $6.25/B200-hour. See `docs/methodology.md`.
 
 Notes on the DeepSeek-V4.1-Flash row (all **measured**): the c=16 figure comes
@@ -25,7 +26,7 @@ advertising a 1M context, while 120,177 tokens serve at 51,527 tok/s.
 ## Layout
 
 ```
-b200/  h100/  a100/  a10g/  b300/  vera-rubin/
+b200/  h100/  a100/  a10g/  b300/  vera-rubin/  rtx3090/
   <model>/  notebook.ipynb  recipe.md  receipts/
 docs/methodology.md
 ```
