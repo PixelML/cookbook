@@ -37,4 +37,6 @@ docs/methodology.md
 |---|---|---|
 | [agentic-video/cost-model](agentic-video/cost-model/) | indexed vs index-free video question answering — per-query video tokens vs one-time ingest + flat library-wide retrieval | [receipts](agentic-video/cost-model/receipts/measured-2026-09-17.json), measured 2026-09-17 |
 
+Agent rules: [`AGENTS.md`](AGENTS.md) (credits first, pins, labels).
+
 Related: [club-170hx](https://github.com/PixelML/club-170hx), [club-dgx-spark](https://github.com/PixelML/club-dgx-spark) (owned-hardware communities).

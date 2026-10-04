@@ -22,6 +22,12 @@ md("""# A coding agent on one RTX 3090: Qwen3.8-Flash-Next IQ2_XS (Strata) + Pi
 2. **Raise the context window.** At 40,960 tokens, two build attempts ran out of context before writing any app file. At 262,144 tokens, the build finished.
 
 Single user, one RTX 3090 24 GB, 16 vCPU, 40 GiB RAM. Labels follow [`docs/methodology.md`](../../docs/methodology.md): **measured** = receipt in `receipts/`."""),
+md("""## Credits
+
+- **Strata** inference engine: authored by Niko ([@Niko1221](https://github.com/Niko1221)), [Niko1221/Strata](https://github.com/Niko1221/Strata) @ [`7df6cbc`](https://github.com/Niko1221/Strata/commit/7df6cbcf6dbef62ca98cddf38710ee6cde8a0f51) (MIT). Our image only rebuilds it for sm86.
+- **Qwen3.8-Flash-Next GSQ-RCO GGUF** (IQ2_XS) quantization: authored by [ISTA-DASLab](https://huggingface.co/ISTA-DASLab), [model card](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF) (Apache-2.0); base model [Qwen/Qwen3.8-Flash-Next](https://huggingface.co/Qwen/Qwen3.8-Flash-Next) by the Qwen team.
+- **Pi** coding agent: authored by Mario Zechner, [earendil-works/pi](https://github.com/earendil-works/pi) (MIT).
+- **three.js** (mrdoob and contributors, MIT) renders the app; ISS positions come from [wheretheiss.at](https://wheretheiss.at); Earth textures from NASA Visible Earth and the three.js example textures (not redistributed here)."""),
 md("""## Pins
 
 | input | pin |
