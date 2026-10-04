@@ -10,4 +10,4 @@ All numbers **measured** unless labelled; receipts in [`receipts/`](receipts/), 
 | Build at 40,960 context | 2 of 2 runs ran out of context, 0 app files |
 | Build at 262,144 context | finished: 105 turns, peak 119,724 tokens, working app ([`app/`](app/)) |
 
-Pins, reproduce steps and the result check: see the notebook. Image digest: **pending** (build from Strata @ `7df6cbcf6dbef62ca98cddf38710ee6cde8a0f51`).
+Pins, reproduce steps and the result check: see the notebook. Image: `ghcr.io/pixelml/strata@sha256:88b9b11628923aaf241c4805a36b0794691b1391b8160c6d2aca5cccf7311237` (Strata @ `7df6cbcf6dbef62ca98cddf38710ee6cde8a0f51`, `CUDA_ARCHITECTURES=86 BUILD_VISION=0`).

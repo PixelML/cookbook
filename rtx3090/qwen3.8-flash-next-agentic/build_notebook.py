@@ -28,7 +28,7 @@ md("""## Pins
 |---|---|
 | GPU / host | 1x RTX 3090 24 GB (180 W cap), driver 610.43.03, in a KVM guest: 16 vCPU Xeon Gold 6138 @ 2.0 GHz, 40 GiB RAM |
 | Engine | [Niko1221/Strata](https://github.com/Niko1221/Strata) @ `7df6cbcf6dbef62ca98cddf38710ee6cde8a0f51` (MIT), built with `CUDA_ARCHITECTURES=86 BUILD_VISION=0` |
-| Image | **PENDING** — built from the commit above; registry digest not yet published |
+| Image | `ghcr.io/pixelml/strata@sha256:88b9b11628923aaf241c4805a36b0794691b1391b8160c6d2aca5cccf7311237` (built from the commit above; `docker pull` works anonymously) |
 | Model | [ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF) @ `ed59f92082b1e93c0e96d60a8b11aab089b52f09`, `IQ2_XS/` (2 shards), Apache-2.0 |
 | Engine args | `--spec 4 --spec-min-p 0.5 --mtp <mtp> --kv int8 --resident-experts --expert-cache auto --prefill auto --max-context 262144` (40960 for runs 1–2) |
 | Agent | Pi (`@earendil-works/pi-coding-agent`) 1.0.0, provider `openai-completions`, `contextWindow` = engine context, `maxTokens` 16384 |
@@ -95,8 +95,9 @@ md("""## Reproduce
 
 ```bash
 # 1. Engine (Linux host, NVIDIA driver, Docker with GPU access)
-git clone https://github.com/Niko1221/Strata && cd Strata && git checkout 7df6cbcf6dbef62ca98cddf38710ee6cde8a0f51
-docker build --build-arg CUDA_ARCHITECTURES=86 --build-arg BUILD_VISION=0 -t strata:sm86-7df6cbc .
+docker pull ghcr.io/pixelml/strata@sha256:88b9b11628923aaf241c4805a36b0794691b1391b8160c6d2aca5cccf7311237
+# or rebuild: git clone https://github.com/Niko1221/Strata && cd Strata && git checkout 7df6cbcf6dbef62ca98cddf38710ee6cde8a0f51
+#   docker build --build-arg CUDA_ARCHITECTURES=86 --build-arg BUILD_VISION=0 -t strata:sm86-7df6cbc .
 # follow Strata's setup.sh for IQ2_XS: it downloads the model at the pinned revision, builds the pack and MTP head,
 # then set "--max-context", "262144" in data/config/strata-iq2_xs.json and start the container (port 8080)
 
